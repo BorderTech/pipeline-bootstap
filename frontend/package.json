@@ -1,0 +1,71 @@
+{
+	"name": "Pipeline Bootstrap",
+	"version": "1.0.0",
+	"description": "React frontend of the pipeline bootstrap application to create a new way for software development projects to create a set of artefacts in the Departments CI/CD pipeline.",
+	"author": "ICT Graduate Team 2019",
+	"private": false,
+	"dependencies": {
+		"bootstrap": "^4.3.1",
+		"classnames": "^2.2.6",
+		"formik": "^1.5.8",
+		"react": "^16.8.6",
+		"react-dom": "^16.8.6",
+		"react-redux": "5.0.7",
+		"react-router-dom": "^5.0.0",
+		"react-scripts": "3.0.0",
+		"reactstrap": "^8.0.0",
+		"yup": "^0.27.0"
+	},
+	"devDependencies": {
+		"babel-preset-env": "1.6.1",
+		"chromedriver": "^2.44.1",
+		"enzyme": "^3.3.0",
+		"enzyme-adapter-react-16": "^1.1.1",
+		"enzyme-to-json": "^3.4.0",
+		"jest": "24.7.1",
+		"jest-cli": "24.7.1",
+		"lighthouse": "3.2.1",
+		"puppeteer": "^1.18.1",
+		"react-test-renderer": "16.4.1",
+		"sass": "1.13.4",
+		"selenium-webdriver": "4.0.0-alpha.1"
+	},
+	"scripts": {
+		"sass": "node ./node_modules/sass/sass src/styles:src/styles/css",
+		"sass-dev": "node ./node_modules/sass/sass --watch src/styles:src/styles/css",
+		"start": "react-scripts start",
+		"sass-build": "node ./node_modules/sass/sass --update src/styles:src/styles/css",
+		"build": "npm run sass-build && react-scripts build",
+		"unit-test": "node ./node_modules/jest/bin/jest --verbose",
+		"ui-test": "node ./node_modules/jest/bin/jest --testMatch=**/?(*.)ui.test.js?(x)",
+		"lighthouse": "node ./node_modules/lighthouse/lighthouse-cli/index.js --quiet --chrome-flags='--headless' http://localhost:3000",
+		"eject": "react-scripts eject"
+	},
+	"jest": {
+		"moduleNameMapper": {
+			"\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/jest/assetMocks.js",
+			"\\.(css|scss|less)$": "<rootDir>/jest/styleMocks.js"
+		},
+		"modulePaths": [
+			"<rootDir>/src/",
+			"<rootDir>/src/components",
+			"<rootDir>/src/styles"
+		],
+		"testMatch": [
+			"**/?(*.)unit.test.js?(x)"
+		],
+		"setupFiles": [
+			"<rootDir>/jest/setupTests.js"
+		],
+		"setupTestFrameworkScriptFile": "raf/polyfill",
+		"snapshotSerializers": [
+			"enzyme-to-json/serializer"
+		]
+	},
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not ie <= 11",
+		"not op_mini all"
+	]
+}

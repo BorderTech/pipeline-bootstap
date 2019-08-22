@@ -1,0 +1,42 @@
+@import 'theme-vars.scss';
+
+.App-logo {
+  height: 80px;
+  margin-top: 1.25rem;
+  display: block;
+}
+
+.App-header {
+  background-image: radial-gradient($ha-clr-royal-blue, $ha-clr-navy-blue);
+  height: 120px;
+  padding: 20px;
+  color: $ha-clr-white;
+  box-sizing: content-box;
+}
+
+.App-title {
+  color: $ha-clr-white;
+  font-size: 2em;
+  margin-top: -3.5rem;
+  float: right;
+}
+
+@media (max-width: 760px) {
+  .App-header {
+    height: 150px;
+  }
+
+  .App-logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 60px;
+    width: 100%;
+  }
+  .App-title {
+    font-size: 24px;
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+  }
+}

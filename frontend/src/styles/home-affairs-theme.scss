@@ -1,0 +1,35 @@
+// ###################################################################################
+// Departmental wide styling including overwriting defaults from third party libraries
+// ###################################################################################
+@import "theme-vars.scss";
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif; // Should we use Open Sans?
+}
+
+h1, h2, h3 {
+  color: $ha-clr-royal-blue;
+}
+  
+h4 {
+  color: $ha-clr-black;
+  font-weight: bold;
+}
+
+p {
+  line-height: 26px;
+  font-size: 16px;
+  margin-top: 1em;
+  text-align: left;
+}
+
+a {
+  color: $ha-clr-mid-blue;
+}
+
+a:visited {
+  color: $ha-clr-purple;
+}
+
+
