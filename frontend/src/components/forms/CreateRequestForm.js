@@ -8,20 +8,41 @@ import RadioButtonInput from '../inputs/RadioButtonInput';
 import RadioButtonInputGroup from '../inputs/RadioButtonInputGroup';
 import TextInput from '../inputs/TextInput';
 import Columns from '../layout/Columns';
+import API from '../../api/api';
 
 export class CreateRequestForm extends Component {
-	submitForm(values, setSubmitting) {
-		setTimeout(() => {
-			// remove software project specific keys
-			// from business projects before submit
-			if (values.projectType === 'business') {
-				delete values.language;
-				delete values.kanbanBoardRequired;
+	async submitForm(values, setSubmitting) {
+		// remove software project specific keys
+		// from business projects before submit
+		if (values.projectType === 'business') {
+			delete values.language;
+			delete values.kanbanBoardRequired;
+		}
+		try {
+			const response = await API.post(`pipeline-requests`, values);
+			console.log('response', response);
+		} catch (error) {
+			if (error.response) {
+				/*
+				 * The request was made and the server responded with a
+				 * status code that falls out of the range of 2xx
+				 */
+				console.log(error.response.data);
+				console.log(error.response.status);
+				console.log(error.response.headers);
+			} else if (error.request) {
+				/*
+				 * The request was made but no response was received, `error.request`
+				 * is an instance of XMLHttpRequest in the browser and an instance
+				 * of http.ClientRequest in Node.js
+				 */
+				console.log(error.request);
+			} else {
+				// Something happened in setting up the request and triggered an Error
+				console.log('Error', error.message);
 			}
-			// post submission to backend API
-			alert(JSON.stringify(values, null, 2));
-			setSubmitting(false);
-		}, 500);
+		}
+		setSubmitting(false);
 	}
 	render() {
 		return (
@@ -46,7 +67,6 @@ export class CreateRequestForm extends Component {
 					} = props;
 					return (
 						<Form onSubmit={handleSubmit}>
-							<h2>Create Request</h2>
 							<h5>Project Options</h5>
 							{/* Project Type */}
 							<RadioButtonInputGroup

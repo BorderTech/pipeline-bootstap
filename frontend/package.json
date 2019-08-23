@@ -1,10 +1,11 @@
 {
-	"name": "Pipeline Bootstrap",
+	"name": "Pipeline_Bootstrap",
 	"version": "1.0.0",
 	"description": "React frontend of the pipeline bootstrap application to create a new way for software development projects to create a set of artefacts in the Departments CI/CD pipeline.",
 	"author": "ICT Graduate Team 2019",
 	"private": false,
 	"dependencies": {
+		"axios": "^0.19.0",
 		"bootstrap": "^4.3.1",
 		"classnames": "^2.2.6",
 		"formik": "^1.5.8",
