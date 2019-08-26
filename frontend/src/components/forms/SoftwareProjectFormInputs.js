@@ -23,7 +23,7 @@ export default function SoftwareProjectFormInputs({
 				<CardBody>
 					<CardTitle>Software Development Project Options</CardTitle>
 					<LanguageSelectInput
-						values={values.language}
+						value={values.language}
 						handleChange={handleChange}
 						handleBlur={handleBlur}
 					/>
