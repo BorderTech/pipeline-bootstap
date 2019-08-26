@@ -19,7 +19,7 @@ export default function LanguageSelectInput({
 				onChange={handleChange}
 				onBlur={handleBlur}
 			>
-				<option key='' value='' disabled>
+				<option key='' value='' disabled selected>
 					Select a language / framework
 				</option>
 				<option key='Java' value='Java'>
@@ -45,7 +45,7 @@ export default function LanguageSelectInput({
 }
 
 LanguageSelectInput.propTypes = {
-	value: PropTypes.string,
+	values: PropTypes.object,
 	handleChange: PropTypes.func,
 	handleBlur: PropTypes.func
 };

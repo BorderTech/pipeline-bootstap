@@ -6,7 +6,7 @@ export class Create extends Component {
 		return (
 			<Fragment>
 				<h2>Create Request</h2>
-				<CreateRequestForm history={this.props.history} />
+				<CreateRequestForm />
 			</Fragment>
 		);
 	}

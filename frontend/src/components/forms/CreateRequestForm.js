@@ -11,19 +11,16 @@ import Columns from '../layout/Columns';
 import API from '../../api/api';
 
 export class CreateRequestForm extends Component {
-	submitForm = async (values, setSubmitting) => {
-		const formattedValues = this.formatSubmission(values);
+	async submitForm(values, setSubmitting) {
+		// remove software project specific keys
+		// from business projects before submit
+		if (values.projectType === 'business') {
+			delete values.language;
+			delete values.kanbanBoardRequired;
+		}
 		try {
-			const response = await API.post(
-				`pipeline-requests`,
-				formattedValues
-			);
-			// Complete Formik submit and send to the success page
-			setSubmitting(false);
-			this.props.history.push({
-				pathname: '/success',
-				state: { id: response.data.id }
-			});
+			const response = await API.post(`pipeline-requests`, values);
+			console.log('response', response);
 		} catch (error) {
 			if (error.response) {
 				/*
@@ -46,18 +43,6 @@ export class CreateRequestForm extends Component {
 			}
 		}
 		setSubmitting(false);
-	};
-	formatSubmission(values) {
-		/*
-		 * Remove software project specific keys from
-		 * business projects prior to submission
-		 */
-		let formattedValues = values;
-		if (formattedValues.projectType === 'business') {
-			delete formattedValues.language;
-			delete formattedValues.kanbanBoardRequired;
-		}
-		return formattedValues;
 	}
 	render() {
 		return (

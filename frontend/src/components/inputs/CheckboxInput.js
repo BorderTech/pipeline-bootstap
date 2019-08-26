@@ -40,7 +40,7 @@ CheckboxInput.propTypes = {
 	}),
 	form: PropTypes.shape({
 		error: PropTypes.string,
-		touched: PropTypes.object,
+		touched: PropTypes.bool,
 		setFieldValue: PropTypes.func
 	})
 };
