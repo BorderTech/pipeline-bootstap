@@ -7,6 +7,7 @@ import { Container } from 'reactstrap';
 import Home from './components/pages/Home';
 import Create from './components/pages/Create';
 import Help from './components/pages/Help';
+import Success from './components/pages/Success';
 
 export default class App extends React.Component {
 	render() {
@@ -21,6 +22,7 @@ export default class App extends React.Component {
 					<Container>
 						<Route exact path='/' component={Home} />
 						<Route path='/create' component={Create} />
+						<Route path='/success' component={Success} />
 						<Route path='/help' component={Help} />
 					</Container>
 				</Router>
