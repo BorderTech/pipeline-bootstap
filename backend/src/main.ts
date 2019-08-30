@@ -3,6 +3,8 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  // TODO: This requires a more elegant solution to
+  // deal with axios not trusting self-signed certs
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
   const app = await NestFactory.create(AppModule);

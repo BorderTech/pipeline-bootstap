@@ -16,6 +16,10 @@ export class CreatePipelineRequestDto {
 
   @ApiModelProperty()
   @IsNotEmpty()
+  orgUnit: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
   projectLead: string;
 
   @ApiModelProperty()

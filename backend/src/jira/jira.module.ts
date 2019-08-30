@@ -1,6 +1,5 @@
 import { Module, HttpModule } from '@nestjs/common';
 import { JiraService } from './jira.service';
-import { JiraController } from './jira.controller';
 import { ConfigService } from '../config/config.service';
 
 const configService = new ConfigService(`${process.env.NODE_ENV}.env`);
@@ -15,6 +14,6 @@ const configService = new ConfigService(`${process.env.NODE_ENV}.env`);
     }),
   ],
   providers: [JiraService],
-  controllers: [JiraController],
+  exports: [JiraService],
 })
 export class JiraModule {}
