@@ -8,7 +8,7 @@ export default function ProjectHeader({ projectName, status, id }) {
 		<Columns>
 			<h2>
 				{projectName} (
-				<a target='_blank' href={`/`}>
+				<a target='_blank' href={`/`} rel='noopener noreferrer'>
 					{id}
 				</a>
 				)

@@ -1,11 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
 import { ReactTableDefaults } from 'react-table';
 import 'react-table/react-table.css';
 import { Button } from 'reactstrap';
 
-export default function PipelineRequestsTable({ data, loading, filter }) {
+export default function PipelineRequestsTable({
+	data,
+	loading,
+	filter,
+	handleStatusFilterChange
+}) {
 	return (
 		<ReactTable
 			data={data}
@@ -39,9 +44,7 @@ export default function PipelineRequestsTable({ data, loading, filter }) {
 					Filter: () => (
 						<select
 							onChange={event =>
-								this.setState({
-									filter: event.target.value
-								})
+								handleStatusFilterChange(event.target.value)
 							}
 							style={{ width: '100%' }}
 							value={filter}
