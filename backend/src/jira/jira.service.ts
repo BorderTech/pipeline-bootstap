@@ -1,8 +1,9 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { CreatePipelineRequestDto } from '../pipeline-requests/dtos/create-pipeline-request.dto';
-import { CreateJiraIssueResponse } from './dto/create-jira-issue-response.dto';
+import { CreateJiraIssueResponseDto } from './dto/create-jira-issue-response.dto';
 import { GetPipelineRequestFilterDto } from '../pipeline-requests/dtos/get-pipeline-requests-fitler.dto';
+import { GetJiraIssueResponseDto } from './dto/get-jira-issue-response.dto';
 
 @Injectable()
 export class JiraService {
@@ -13,7 +14,9 @@ export class JiraService {
       .pipe(map(response => response.data));
   }
 
-  getPipelineRequestIssues(filterDto: GetPipelineRequestFilterDto) {
+  getPipelineRequestIssues(
+    filterDto: GetPipelineRequestFilterDto,
+  ): Promise<GetJiraIssueResponseDto[]> {
     const { status } = filterDto;
     const query = `project+%3D+PIPEREQ+AND+issuetype+%3D+Task+AND+status+%3D+"${status}"+ORDER+BY+created+DESC`;
     return this.httpService
@@ -22,16 +25,18 @@ export class JiraService {
       .toPromise();
   }
 
-  async getPipelineRequestIssue(id: string) {
-    return this.httpService
-      .get(`/issue/${id}`)
-      .pipe(map(response => response.data))
-      .toPromise();
+  async getPipelineRequestIssue(id: string): Promise<GetJiraIssueResponseDto> {
+    try {
+      const response = await this.httpService.get(`/issue/${id}`).toPromise();
+      return response.data;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async createPipelineRequestIssue(
     createRequestDto: CreatePipelineRequestDto,
-  ): Promise<CreateJiraIssueResponse> {
+  ): Promise<CreateJiraIssueResponseDto> {
     const data = {
       fields: {
         project: {

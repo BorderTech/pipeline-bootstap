@@ -8,4 +8,6 @@ export interface PipelineRequest {
   language: string;
   kanbanBoardRequired: boolean;
   wbsCode: string;
+  created: Date;
+  status: string;
 }

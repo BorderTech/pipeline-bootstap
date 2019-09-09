@@ -3,13 +3,13 @@ import { PipelineRequest } from './pipeline-request.model';
 import { CreatePipelineRequestDto } from './dtos/create-pipeline-request.dto';
 import { GetPipelineRequestFilterDto } from './dtos/get-pipeline-requests-fitler.dto';
 import { JiraService } from '../jira/jira.service';
-import { CreateJiraIssueResponse } from '../jira/dto/create-jira-issue-response.dto';
+import { CreateJiraIssueResponseDto } from '../jira/dto/create-jira-issue-response.dto';
 
 @Injectable()
 export class PipelineRequestsService {
   constructor(private jiraService: JiraService) {}
 
-  async getAllRequests(
+  async findAll(
     filterDto: GetPipelineRequestFilterDto,
   ): Promise<PipelineRequest[]> {
     const jiraIssues = await this.jiraService.getPipelineRequestIssues(
@@ -18,30 +18,49 @@ export class PipelineRequestsService {
     const pipelineRequests: PipelineRequest[] = jiraIssues.map(issue => {
       return {
         id: issue.key,
+        created: issue.fields.created,
+        status: issue.fields.status.name,
+        requestor: issue.fields.reporter.displayName,
         ...JSON.parse(issue.fields.description),
       };
     });
     return pipelineRequests;
   }
 
-  async getRequestById(id: string): Promise<PipelineRequest> {
-    // TODO: NotFoundException if not found
+  async findOne(id: string): Promise<PipelineRequest> {
     const jiraIssue = await this.jiraService.getPipelineRequestIssue(id);
+    if (!jiraIssue) {
+      throw new NotFoundException(
+        `Pipeline Request with ID "${id}" was not found.`,
+      );
+    }
     const { key, fields } = jiraIssue;
     const pipelineRequest: PipelineRequest = {
       id: key,
+      created: fields.created,
+      status: fields.status.name,
+      requestor: fields.reporter.displayName,
       ...JSON.parse(fields.description),
     };
     return pipelineRequest;
   }
 
   async createRequest(createRequestDto: CreatePipelineRequestDto) {
-    const createJiraIssueRes: CreateJiraIssueResponse = await this.jiraService.createPipelineRequestIssue(
+    // Create the pipeline request
+    const createJiraIssueRes: CreateJiraIssueResponseDto = await this.jiraService.createPipelineRequestIssue(
       createRequestDto,
     );
+    // Get pipeline request that was created.
+    const jiraIssue = await this.jiraService.getPipelineRequestIssue(
+      createJiraIssueRes.key,
+    );
+    const { key, fields } = jiraIssue;
     const pipelineRequest: PipelineRequest = {
-      id: createJiraIssueRes.key,
-      ...createRequestDto,
+      id: key,
+      created: fields.created,
+      status: fields.status.name,
+      requestor: fields.reporter.displayName,
+      ...JSON.parse(fields.description),
     };
     return pipelineRequest;
   }
