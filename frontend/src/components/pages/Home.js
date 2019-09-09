@@ -1,8 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 export class Home extends Component {
 	render() {
-		return <div>Home Page component</div>;
+		return (
+			<Fragment>
+				<div>Home Page component</div>
+			</Fragment>
+		);
 	}
 }
 

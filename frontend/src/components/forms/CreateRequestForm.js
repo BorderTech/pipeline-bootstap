@@ -159,6 +159,20 @@ export class CreateRequestForm extends Component {
 
 							{/* WBS Code */}
 							<TextInput
+								id='orgUnit'
+								label='Organisation Unit'
+								type='text'
+								placeholder='Enter your project Organisation Unit'
+								value={values.orgUnit}
+								handleChange={handleChange}
+								handleBlur={handleBlur}
+								errors={errors.orgUnit}
+								touched={touched.orgUnit}
+								required
+							/>
+
+							{/* Org Unit */}
+							<TextInput
 								id='wbsCode'
 								label='WBS Code'
 								type='text'
@@ -166,8 +180,8 @@ export class CreateRequestForm extends Component {
 								value={values.wbsCode}
 								handleChange={handleChange}
 								handleBlur={handleBlur}
-								errors={errors.projectTechLead}
-								touched={touched.projectTechLead}
+								errors={errors.wbsCode}
+								touched={touched.wbsCode}
 								required
 							/>
 							{/* Conditionally display software project form options */}

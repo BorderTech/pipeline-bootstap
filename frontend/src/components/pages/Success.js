@@ -19,11 +19,11 @@ export class Success extends Component {
 				<h3>Your request has been submitted successfully.</h3>
 				<h4>You can track your progress here:</h4>
 				<h5> Jira Issue: {id}</h5>
-				<IconContext.Provider value={{ color: 'Green', size: '4em' }}>
+				{/* <IconContext.Provider value={{ color: 'Green', size: '4em' }}>
 					<div>
 						<FaCheckCircle />
 					</div>
-				</IconContext.Provider>
+				</IconContext.Provider> */}
 				<Link to='/create'>
 					<Button color='primary'>Create New Request</Button>
 				</Link>
