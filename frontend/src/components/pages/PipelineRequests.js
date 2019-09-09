@@ -1,12 +1,58 @@
-import React, { Fragment } from 'react';
+import React, { Component, Fragment } from 'react';
+import Loader from '../layout/Loader';
 import PipelineRequestsTable from '../tables/PipelineRequestsTable';
-import { Button } from 'reactstrap';
+import API from '../../api/api';
 
-export default function PipelineRequests() {
-	return (
-		<Fragment>
-			<h2>Pipeline Requests</h2>
-			<PipelineRequestsTable />
-		</Fragment>
-	);
+export class PipelineRequests extends Component {
+	state = {
+		filter: 'To Do',
+		loading: true,
+		data: []
+	};
+	async componentDidMount() {
+		this.getPipelineRequests();
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.filter !== this.state.filter) {
+			this.getPipelineRequests();
+		}
+	}
+
+	async getPipelineRequests() {
+		const { filter } = this.state;
+		try {
+			this.setState({ loading: true });
+			const response = await API.get(
+				`pipeline-requests?status=${filter}`
+			);
+			this.setState({ data: response.data, loading: false });
+		} catch (err) {
+			console.log(err);
+			this.setState({ loading: false });
+		}
+	}
+	render() {
+		const { data, loading, filter } = this.state;
+		return (
+			<Fragment>
+				{/* Page loading while waiting for backend response */}
+				{loading ? <Loader /> : null}
+
+				{/* Successful page load - display tables */}
+				{!loading ? (
+					<Fragment>
+						<h2>Pipeline Requests</h2>
+						<PipelineRequestsTable
+							data={data}
+							loading={loading}
+							filter={filter}
+						/>
+					</Fragment>
+				) : null}
+			</Fragment>
+		);
+	}
 }
+
+export default PipelineRequests;
