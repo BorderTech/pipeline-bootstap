@@ -19,6 +19,12 @@ export class PipelineRequests extends Component {
 		}
 	}
 
+	handleStatusFilterChange = status => {
+		this.setState({
+			filter: status
+		});
+	};
+
 	async getPipelineRequests() {
 		const { filter } = this.state;
 		try {
@@ -47,6 +53,9 @@ export class PipelineRequests extends Component {
 							data={data}
 							loading={loading}
 							filter={filter}
+							handleStatusFilterChange={
+								this.handleStatusFilterChange
+							}
 						/>
 					</Fragment>
 				) : null}
