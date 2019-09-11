@@ -57,6 +57,7 @@ export class PipelineRequest extends Component {
 			orgUnit,
 			wbsCode,
 			kanbanBoardRequired,
+			projectManagementRequired,
 			language
 		} = this.state.data;
 		return (
@@ -89,6 +90,9 @@ export class PipelineRequest extends Component {
 						<JiraInformationTable
 							projectType={projectType}
 							kanbanBoardRequired={kanbanBoardRequired}
+							projectManagementRequired={
+								projectManagementRequired
+							}
 						/>
 						<ConfluenceInformationTable />
 						{/* Display optional table for software development projects */}

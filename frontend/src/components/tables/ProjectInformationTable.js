@@ -46,7 +46,9 @@ export default function ProjectInformationTable({
 				</tr>
 				<tr>
 					<td>Tech Lead(s)</td>
-					<td>{projectTechLead}</td>
+					<td>
+						{projectTechLead ? projectTechLead.toString() : '-'}
+					</td>
 				</tr>
 				<tr>
 					<td>Organisational Unit</td>

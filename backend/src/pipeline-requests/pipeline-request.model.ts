@@ -7,6 +7,7 @@ export interface PipelineRequest {
   projectTechLead: string[];
   language: string;
   kanbanBoardRequired: boolean;
+  projectManagementRequired: boolean;
   wbsCode: string;
   created: Date;
   status: string;

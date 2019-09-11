@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsArray } from 'class-validator';
 
 export class CreatePipelineRequestDto {
   @ApiModelProperty()
@@ -23,6 +23,7 @@ export class CreatePipelineRequestDto {
   projectLead: string;
 
   @ApiModelProperty()
+  @IsArray()
   projectTechLead: string[];
 
   @ApiModelProperty()

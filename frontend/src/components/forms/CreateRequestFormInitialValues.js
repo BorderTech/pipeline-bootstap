@@ -1,10 +1,11 @@
 export default {
-	projectType: '',
+	projectType: 'software',
 	projectName: '',
 	projectDescription: '',
 	projectLead: '',
 	projectTechLead: '',
 	language: '',
 	kanbanBoardRequired: false,
+	projectManagementRequired: false,
 	wbsCode: ''
 };

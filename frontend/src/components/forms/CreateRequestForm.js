@@ -4,6 +4,7 @@ import { Button } from 'reactstrap';
 import CreateRequestFormInitialValues from './CreateRequestFormInitialValues';
 import { CreateRequestFormValidationSchema } from './CreateRequestFormValidation';
 import SoftwareProjectFormInputs from './SoftwareProjectFormInputs';
+import BusinessProjectFormInputs from './BusinessProjectFormInputs';
 import RadioButtonInput from '../inputs/RadioButtonInput';
 import RadioButtonInputGroup from '../inputs/RadioButtonInputGroup';
 import TextInput from '../inputs/TextInput';
@@ -13,6 +14,7 @@ import API from '../../api/api';
 export class CreateRequestForm extends Component {
 	submitForm = async (values, setSubmitting) => {
 		const formattedValues = this.formatSubmission(values);
+		console.log(formattedValues);
 		try {
 			const response = await API.post(
 				`pipeline-requests`,
@@ -48,15 +50,25 @@ export class CreateRequestForm extends Component {
 		setSubmitting(false);
 	};
 	formatSubmission(values) {
-		/*
-		 * Remove software project specific keys from
-		 * business projects prior to submission
-		 */
-		let formattedValues = values;
+		//  Remove software project specific keys from
+		//  business & software projects prior to submission
+		let formattedValues = { ...values };
 		if (formattedValues.projectType === 'business') {
 			delete formattedValues.language;
 			delete formattedValues.kanbanBoardRequired;
 		}
+		if (formattedValues.projectType === 'software') {
+			delete formattedValues.projectManagementRequired;
+		}
+
+		//  Convert CSV formatted projectTechLead
+		//  to string array to pass API validation
+		if (formattedValues.projectTechLead) {
+			formattedValues.projectTechLead = formattedValues.projectTechLead
+				.trim()
+				.split(',');
+		}
+		console.log(formattedValues);
 		return formattedValues;
 	}
 	render() {
@@ -94,14 +106,14 @@ export class CreateRequestForm extends Component {
 								<Field
 									component={RadioButtonInput}
 									name='projectType'
-									id='business'
-									label='Business'
+									id='software'
+									label='Software'
 								/>
 								<Field
 									component={RadioButtonInput}
 									name='projectType'
-									id='software'
-									label='Software'
+									id='business'
+									label='Business'
 								/>
 							</RadioButtonInputGroup>
 							{/* Project Name */}
@@ -194,6 +206,17 @@ export class CreateRequestForm extends Component {
 									handleBlur={handleBlur}
 								/>
 							) : null}
+							{/* Conditionally display business project form options */}
+							{values.projectType === 'business' ? (
+								<BusinessProjectFormInputs
+									values={values}
+									errors={errors}
+									touched={touched}
+									handleChange={handleChange}
+									handleBlur={handleBlur}
+								/>
+							) : null}
+
 							{/* Submit & Reset buttons */}
 							<Button
 								type='button'
