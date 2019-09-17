@@ -11,7 +11,8 @@ import ErrorAlert from '../layout/ErrorAlert';
 export class PipelineRequest extends Component {
 	state = {
 		loading: false,
-		data: {
+		creatingPipeline: false,
+		pipelineRequest: {
 			id: '',
 			status: '',
 			projectName: '',
@@ -29,21 +30,8 @@ export class PipelineRequest extends Component {
 		const { id } = this.props.match.params;
 		this.getPipelineRequest(id);
 	}
-
-	async getPipelineRequest(id) {
-		try {
-			this.setState({ loading: true });
-			const response = await API.get(`pipeline-requests/${id}`);
-			this.setState({ data: response.data, loading: false });
-		} catch (error) {
-			this.setState({
-				error: error.response.data.message,
-				loading: false
-			});
-		}
-	}
 	render() {
-		const { loading, error } = this.state;
+		const { loading, error, creatingPipeline } = this.state;
 		const {
 			id,
 			status,
@@ -59,7 +47,7 @@ export class PipelineRequest extends Component {
 			kanbanBoardRequired,
 			projectManagementRequired,
 			language
-		} = this.state.data;
+		} = this.state.pipelineRequest;
 		return (
 			<Fragment>
 				{/* Page loading while waiting for backend response */}
@@ -69,12 +57,14 @@ export class PipelineRequest extends Component {
 				{!loading && error ? <ErrorAlert message={error} /> : null}
 
 				{/* Successful page load - display tables */}
-				{!error && !loading ? (
+				{id && !loading ? (
 					<Fragment>
 						<ProjectHeader
 							id={id}
 							status={status}
 							projectName={projectName}
+							creatingPipeline={creatingPipeline}
+							approvePipelineRequest={this.approvePipelineRequest}
 						></ProjectHeader>
 						<ProjectInformationTable
 							projectName={projectName}
@@ -103,6 +93,74 @@ export class PipelineRequest extends Component {
 				) : null}
 			</Fragment>
 		);
+	}
+	approvePipelineRequest = async () => {
+		const { pipelineRequest } = this.state;
+		const createPipelineDto = this.makeCreatePipelineDto(pipelineRequest);
+		try {
+			console.log('Approve pipeline clicked');
+			this.setState({ creatingPipeline: true });
+			const response = await API.post(`pipelines`, createPipelineDto);
+			// Do something with the reponse...
+			// console.log(response);
+		} catch (error) {
+			// Handle error here...
+			console.log(error);
+			this.setState({
+				error: error.response.data.message,
+				loading: false
+			});
+		}
+		setTimeout(() => {
+			this.setState({ creatingPipeline: false });
+		}, 1000);
+	};
+
+	async getPipelineRequest(id) {
+		try {
+			this.setState({ loading: true });
+			const response = await API.get(`pipeline-requests/${id}`);
+			this.setState({ pipelineRequest: response.data, loading: false });
+		} catch (error) {
+			this.setState({
+				error: error.response.data.message,
+				loading: false
+			});
+		}
+	}
+	makeCreatePipelineDto(pipelineRequest) {
+		let createPipelineDto;
+		// Properties shared by business & software projects
+		const {
+			projectType,
+			projectName,
+			projectDescription,
+			projectLead,
+			projectTechLead,
+			orgUnit,
+			wbsCode,
+			projectManagementRequired,
+			kanbanBoardRequired
+		} = pipelineRequest;
+		createPipelineDto = {
+			projectType,
+			projectName,
+			projectDescription,
+			projectLead,
+			projectTechLead,
+			orgUnit,
+			wbsCode
+		};
+		// Properties unique to each type
+		if (projectType === 'business') {
+			createPipelineDto = {
+				...createPipelineDto,
+				projectManagementRequired
+			};
+		} else if (projectType === 'software') {
+			createPipelineDto = { ...createPipelineDto, kanbanBoardRequired };
+		}
+		return createPipelineDto;
 	}
 }
 
