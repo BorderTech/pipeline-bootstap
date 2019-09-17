@@ -15,22 +15,22 @@ import { GetPipelineRequestFilterDto } from './dtos/get-pipeline-requests-fitler
 
 @Controller('pipeline-requests')
 export class PipelineRequestsController {
-  constructor(private requestsService: PipelineRequestsService) {}
+  constructor(private pipelineRequestsService: PipelineRequestsService) {}
   @Get()
   findAll(
     @Query() filterDto: GetPipelineRequestFilterDto,
   ): Promise<PipelineRequest[]> {
-    return this.requestsService.findAll(filterDto);
+    return this.pipelineRequestsService.findAll(filterDto);
   }
   @Get(':id')
   findOne(@Param('id') id: string): Promise<PipelineRequest> {
-    return this.requestsService.findOne(id);
+    return this.pipelineRequestsService.findOne(id);
   }
   @Post()
   @UsePipes(ValidationPipe)
   createRequest(
     @Body() createRequestDto: CreatePipelineRequestDto,
   ): Promise<PipelineRequest> {
-    return this.requestsService.createRequest(createRequestDto);
+    return this.pipelineRequestsService.createRequest(createRequestDto);
   }
 }

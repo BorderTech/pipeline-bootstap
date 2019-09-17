@@ -8,13 +8,6 @@ export class Issuetype {
   avatarId: number;
 }
 
-export class AvatarUrls {
-  '48x48': string;
-  '24x24': string;
-  '16x16': string;
-  '32x32': string;
-}
-
 export class Project {
   self: string;
   id: string;
@@ -30,7 +23,7 @@ export class Watches {
   isWatching: boolean;
 }
 
-export class AvatarUrls2 {
+export class AvatarUrls {
   '48x48': string;
   '24x24': string;
   '16x16': string;
@@ -42,17 +35,10 @@ export class Creator {
   name: string;
   key: string;
   emailAddress: string;
-  avatarUrls: AvatarUrls2;
+  avatarUrls: AvatarUrls;
   displayName: string;
   active: boolean;
   timeZone: string;
-}
-
-export class AvatarUrls3 {
-  '48x48': string;
-  '24x24': string;
-  '16x16': string;
-  '32x32': string;
 }
 
 export class Reporter {
@@ -60,7 +46,7 @@ export class Reporter {
   name: string;
   key: string;
   emailAddress: string;
-  avatarUrls: AvatarUrls3;
+  avatarUrls: AvatarUrls;
   displayName: string;
   active: boolean;
   timeZone: string;

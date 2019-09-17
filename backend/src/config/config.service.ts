@@ -30,6 +30,22 @@ export class ConfigService {
     return this.envConfig.JIRA_BASE_URL;
   }
 
+  get jiraWebBaseURL(): string {
+    return this.envConfig.JIRA_WEB_BASE_URL;
+  }
+
+  get confluenceUsername(): string {
+    return this.envConfig.CONFLUENCE_USERNAME;
+  }
+
+  get confluencePassword(): string {
+    return this.envConfig.CONFLUENCE_PASSWORD;
+  }
+
+  get confluenceBaseURL(): string {
+    return this.envConfig.CONFLUENCE_BASE_URL;
+  }
+
   /**
    * Ensures all needed variables are set, and returns the validated JavaScript object
    * including the applied default values.
@@ -40,8 +56,12 @@ export class ConfigService {
         .valid(['development', 'production', 'test', 'provision'])
         .default('development'),
       JIRA_BASE_URL: Joi.string().required(),
+      JIRA_WEB_BASE_URL: Joi.string().required(),
       JIRA_USERNAME: Joi.string().required(),
       JIRA_PASSWORD: Joi.string().required(),
+      CONFLUENCE_BASE_URL: Joi.string().required(),
+      CONFLUENCE_USERNAME: Joi.string().required(),
+      CONFLUENCE_PASSWORD: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
