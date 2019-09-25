@@ -3,10 +3,11 @@ import { PipelinesController } from './pipelines.controller';
 import { PipelinesService } from './pipelines.service';
 import { JiraModule } from '../jira/jira.module';
 import { ConfluenceModule } from '../confluence/confluence.module';
+import { BitbucketModule } from '../bitbucket/bitbucket.module';
 import { ConfigModule } from '../config/config.module';
 
 @Module({
-  imports: [JiraModule, ConfluenceModule, ConfigModule],
+  imports: [JiraModule, ConfluenceModule, BitbucketModule, ConfigModule],
   controllers: [PipelinesController],
   providers: [PipelinesService],
 })

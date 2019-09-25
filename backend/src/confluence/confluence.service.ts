@@ -1,43 +1,53 @@
-import {
-  Injectable,
-  HttpService,
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, HttpService, Logger } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { CreatePipelineRequestDto } from '../pipeline-requests/dtos/create-pipeline-request.dto';
 import { CreateConfluenceSpaceResponseDto } from './dto/create-space-request.dto';
 import { CreateConfluenceSpaceRequestDto } from './dto/create-confluence-space-request.dto';
+import { CreatePipelineDto } from '../pipelines/dtos/create-pipeline.dto';
+import { handleAxiosError } from '../common/errors/axios-error-handler';
 
 @Injectable()
 export class ConfluenceService {
+  private logger = new Logger('ConfluenceService');
+
   constructor(private readonly httpService: HttpService) {}
 
   async createSpace(
-    createRequestDto: CreatePipelineRequestDto,
+    createPipelineDto: CreatePipelineDto,
   ): Promise<CreateConfluenceSpaceResponseDto> {
-    let createConfluenceSpaceResponseDto: CreateConfluenceSpaceResponseDto;
     const createConfluenceSpaceRequest: CreateConfluenceSpaceRequestDto = this.makeCreateConfluenceSpaceRequestDto(
-      createRequestDto,
+      createPipelineDto,
     );
     try {
-      createConfluenceSpaceResponseDto = await this.httpService
+      this.logger.verbose(
+        `Creating Confluence Space. Data: ${JSON.stringify(
+          createConfluenceSpaceRequest,
+        )}`,
+      );
+      const data: CreateConfluenceSpaceResponseDto = await this.httpService
         .post(`/space`, createConfluenceSpaceRequest)
         .pipe(map(response => response.data))
         .toPromise();
-
-      return createConfluenceSpaceResponseDto;
+      this.logger.verbose(
+        `Created Confluence Space. Data: ${JSON.stringify(data)}`,
+      );
+      return data;
     } catch (error) {
-      if (error.response.data) {
-        console.log('Confluence error', error.response.data);
-        if (error.response.status === 400) {
-          const errorMessage = { confluence: error.response.data };
-          throw new BadRequestException(errorMessage);
-        }
-      } else {
-        // We malfunctioned somehow - not the users fault
-        throw new InternalServerErrorException(error);
-      }
+      handleAxiosError(error);
+    }
+  }
+
+  async deleteSpace(spaceKey: string) {
+    try {
+      this.logger.verbose(`Deleting space: ${spaceKey}`);
+      const data = await this.httpService
+        .delete(`/space/${spaceKey}`)
+        .pipe(map(response => response.data))
+        .toPromise();
+      this.logger.verbose(`Deleted space: ${spaceKey}`);
+      return data;
+    } catch (error) {
+      handleAxiosError(error);
     }
   }
 

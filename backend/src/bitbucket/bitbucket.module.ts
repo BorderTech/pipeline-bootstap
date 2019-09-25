@@ -1,21 +1,22 @@
 import { Module, HttpModule } from '@nestjs/common';
-import { JiraService } from './jira.service';
+import { BitbucketService } from './bitbucket.service';
 import { ConfigService } from '../config/config.service';
 import { ConfigModule } from '../config/config.module';
 
 const configService = new ConfigService(`${process.env.NODE_ENV}.env`);
+
 @Module({
   imports: [
     ConfigModule,
     HttpModule.register({
-      baseURL: configService.jiraBaseURL,
+      baseURL: configService.bitbucketBaseURL,
       auth: {
-        username: configService.jiraUsername,
-        password: configService.jiraPassword,
+        username: configService.bitbucketUsername,
+        password: configService.bitbucketPassword,
       },
     }),
   ],
-  providers: [JiraService],
-  exports: [JiraService],
+  providers: [BitbucketService],
+  exports: [BitbucketService],
 })
-export class JiraModule {}
+export class BitbucketModule {}

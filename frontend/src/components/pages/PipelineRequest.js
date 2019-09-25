@@ -122,8 +122,9 @@ export class PipelineRequest extends Component {
 			const response = await API.get(`pipeline-requests/${id}`);
 			this.setState({ pipelineRequest: response.data, loading: false });
 		} catch (error) {
+			const { message } = error.response.data.message;
 			this.setState({
-				error: error.response.data.message,
+				error: message,
 				loading: false
 			});
 		}

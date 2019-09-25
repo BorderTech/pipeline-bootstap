@@ -34,6 +34,22 @@ export class ConfigService {
     return this.envConfig.JIRA_WEB_BASE_URL;
   }
 
+  get jiraIssueDoneLabel(): string {
+    return this.envConfig.JIRA_ISSUE_DONE_LABEL;
+  }
+
+  get jiraIssueRepositoryKey(): string {
+    return this.envConfig.JIRA_ISSUE_REPOSITORY_KEY;
+  }
+
+  get jiraPipelineRequestIssueType(): string {
+    return this.envConfig.JIRA_PIPELINE_REQUEST_ISSUE_TYPE;
+  }
+
+  get jiraPipelineRequestSummaryText(): string {
+    return this.envConfig.JIRA_PIPELINE_REQUEST_SUMMARY_TEXT;
+  }
+
   get confluenceUsername(): string {
     return this.envConfig.CONFLUENCE_USERNAME;
   }
@@ -44,6 +60,26 @@ export class ConfigService {
 
   get confluenceBaseURL(): string {
     return this.envConfig.CONFLUENCE_BASE_URL;
+  }
+
+  get bitbucketUsername(): string {
+    return this.envConfig.BITBUCKET_USERNAME;
+  }
+
+  get bitbucketPassword(): string {
+    return this.envConfig.BITBUCKET_PASSWORD;
+  }
+
+  get bitbucketBaseURL(): string {
+    return this.envConfig.BITBUCKET_BASE_URL;
+  }
+
+  get bitbucketWebBaseURL(): string {
+    return this.envConfig.BITBUCKET_WEB_BASE_URL;
+  }
+
+  get bitbucketProject(): string {
+    return this.envConfig.BITBUCKET_PROJECT;
   }
 
   /**
@@ -59,9 +95,21 @@ export class ConfigService {
       JIRA_WEB_BASE_URL: Joi.string().required(),
       JIRA_USERNAME: Joi.string().required(),
       JIRA_PASSWORD: Joi.string().required(),
+      JIRA_ISSUE_DONE_LABEL: Joi.string().required(),
+
+      JIRA_ISSUE_REPOSITORY_KEY: Joi.string().required(),
+      JIRA_PIPELINE_REQUEST_ISSUE_TYPE: Joi.string().required(),
+      JIRA_PIPELINE_REQUEST_SUMMARY_TEXT: Joi.string().required(),
+
       CONFLUENCE_BASE_URL: Joi.string().required(),
       CONFLUENCE_USERNAME: Joi.string().required(),
       CONFLUENCE_PASSWORD: Joi.string().required(),
+
+      BITBUCKET_BASE_URL: Joi.string().required(),
+      BITBUCKET_WEB_BASE_URL: Joi.string().required(),
+      BITBUCKET_PROJECT: Joi.string().required(),
+      BITBUCKET_USERNAME: Joi.string().required(),
+      BITBUCKET_PASSWORD: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(

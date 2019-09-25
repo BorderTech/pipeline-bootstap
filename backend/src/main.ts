@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/filters/all-exception.filter';
 
 async function bootstrap() {
   // TODO: This requires a more elegant solution to
@@ -9,6 +10,7 @@ async function bootstrap() {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
