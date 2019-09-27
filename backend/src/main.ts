@@ -14,6 +14,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
+  // app.useLogger(app.get('NestWinston'));
 
   /* Swagger Configuration */
   const options = new DocumentBuilder()

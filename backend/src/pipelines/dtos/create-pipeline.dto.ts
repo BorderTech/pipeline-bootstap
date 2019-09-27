@@ -9,6 +9,11 @@ import {
 
 export class CreatePipelineDto {
   @ApiModelProperty()
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
+  @ApiModelProperty()
   @IsNotEmpty() // example of custom message
   @IsString()
   projectType: string;

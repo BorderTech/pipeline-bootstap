@@ -4,22 +4,28 @@ import {
   Body,
   ValidationPipe,
   UsePipes,
-  Logger,
+  Inject,
 } from '@nestjs/common';
 import { CreatePipelineDto } from './dtos/create-pipeline.dto';
 import { PipelinesService } from './pipelines.service';
+import { Logger } from 'winston';
 
 @Controller('pipelines')
 export class PipelinesController {
-  private logger = new Logger('PipelinesController');
-
-  constructor(private pipelinesService: PipelinesService) {}
+  constructor(
+    private pipelinesService: PipelinesService,
+    @Inject('winston') private readonly logger: Logger,
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
   createPipeline(@Body() createPipelineDto: CreatePipelineDto) {
-    this.logger.verbose(
-      `User creating pipeline. Data: ${JSON.stringify(createPipelineDto)}`,
+    this.logger.debug(
+      `User creating pipeline for project: ${createPipelineDto.projectName}`,
+      {
+        label: 'PipelinesController : createPipeline',
+        project: createPipelineDto,
+      },
     );
     return this.pipelinesService.createPipeline(createPipelineDto);
   }

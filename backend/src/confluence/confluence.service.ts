@@ -1,16 +1,18 @@
-import { Injectable, HttpService, Logger } from '@nestjs/common';
+import { Injectable, HttpService, Inject } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { CreatePipelineRequestDto } from '../pipeline-requests/dtos/create-pipeline-request.dto';
 import { CreateConfluenceSpaceResponseDto } from './dto/create-space-request.dto';
 import { CreateConfluenceSpaceRequestDto } from './dto/create-confluence-space-request.dto';
 import { CreatePipelineDto } from '../pipelines/dtos/create-pipeline.dto';
 import { handleAxiosError } from '../common/errors/axios-error-handler';
+import { Logger } from 'winston';
 
 @Injectable()
 export class ConfluenceService {
-  private logger = new Logger('ConfluenceService');
-
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @Inject('winston') private readonly logger: Logger,
+  ) {}
 
   async createSpace(
     createPipelineDto: CreatePipelineDto,
@@ -19,18 +21,30 @@ export class ConfluenceService {
       createPipelineDto,
     );
     try {
-      this.logger.verbose(
-        `Creating Confluence Space. Data: ${JSON.stringify(
-          createConfluenceSpaceRequest,
-        )}`,
+      this.logger.debug(
+        `Creating Confluence Space for project: ${
+          createPipelineDto.projectName
+        }.`,
+        {
+          label: 'ConfluenceService : createSpace',
+          request: createConfluenceSpaceRequest,
+        },
       );
       const data: CreateConfluenceSpaceResponseDto = await this.httpService
         .post(`/space`, createConfluenceSpaceRequest)
         .pipe(map(response => response.data))
         .toPromise();
-      this.logger.verbose(
-        `Created Confluence Space. Data: ${JSON.stringify(data)}`,
+
+      this.logger.debug(
+        `Creating Confluence Space for project: ${
+          createPipelineDto.projectName
+        }.`,
+        {
+          label: 'ConfluenceService : createSpace',
+          space: data,
+        },
       );
+
       return data;
     } catch (error) {
       handleAxiosError(error);

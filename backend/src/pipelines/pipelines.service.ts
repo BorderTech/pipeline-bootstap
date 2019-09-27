@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { CreatePipelineDto } from './dtos/create-pipeline.dto';
 import { JiraService } from '../jira/jira.service';
 import { ConfluenceService } from '../confluence/confluence.service';
@@ -8,16 +8,16 @@ import { BitbucketService } from '../bitbucket/bitbucket.service';
 import { CreateConfluenceSpaceResponseDto } from '../confluence/dto/create-space-request.dto';
 import { CreateBitbucketRepositoryResponseDto } from '../bitbucket/dto/create-bitbucket-repository-reponse.dto';
 import { CreatePipelineResponseDto } from './dtos/create-pipeline-response.dto';
+import { Logger } from 'winston';
 
 @Injectable()
 export class PipelinesService {
-  private logger = new Logger('PipelinesService');
-
   constructor(
     private jiraService: JiraService,
     private confluenceService: ConfluenceService,
     private bitbucketService: BitbucketService,
     private configService: ConfigService,
+    @Inject('winston') private readonly logger: Logger,
   ) {}
 
   async createPipeline(createPipelineDto: CreatePipelineDto) {
@@ -25,8 +25,12 @@ export class PipelinesService {
     let getConfluenceSpaceResponseDto: CreateConfluenceSpaceResponseDto;
     let getBitbucketRepositoryResponseDto: CreateBitbucketRepositoryResponseDto;
 
-    this.logger.verbose(
-      `Creating pipeline. Data: ${JSON.stringify(createPipelineDto)}`,
+    this.logger.debug(
+      `Creating pipeline for project: ${createPipelineDto.projectName}`,
+      {
+        label: 'PipelinesService : createPipeline',
+        project: createPipelineDto,
+      },
     );
 
     try {
@@ -43,8 +47,19 @@ export class PipelinesService {
         getBitbucketRepositoryResponseDto = await this.bitbucketService.createRepository(
           createPipelineDto,
         );
-        console.log(getBitbucketRepositoryResponseDto);
       }
+
+      this.logger.debug(
+        `Created pipeline for project: ${createPipelineDto.projectName}`,
+        {
+          label: 'PipelinesService : createPipeline',
+          project: createPipelineDto,
+        },
+      );
+
+      /* Update PipelineRequest with URLs Jira Issue & Transition to Done */
+      this.jiraService.transitionIssueToDone(createPipelineDto.id);
+
       /* Return pipelineResponseDto */
       return this.makePipelineResponseDto(
         getJiraProjectResponseDto,
@@ -52,8 +67,13 @@ export class PipelinesService {
         getBitbucketRepositoryResponseDto,
       );
     } catch (error) {
-      // Delete anything that was partially created in the event of a failure
-      this.logger.warn(`Error creating pipeline. Deleting partial creation.`);
+      /* Delete anything that was partially created in the event of a failure */
+      this.logger.warn(
+        `Error creating pipeline for project: ${
+          createPipelineDto.projectName
+        }. Deleting partial creation.`,
+      );
+
       await this.handlePipelineCreationFailure(
         getJiraProjectResponseDto,
         getConfluenceSpaceResponseDto,

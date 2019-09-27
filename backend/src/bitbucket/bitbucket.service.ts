@@ -1,18 +1,18 @@
-import { Injectable, HttpService, Logger } from '@nestjs/common';
+import { Injectable, HttpService, Inject } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { CreatePipelineDto } from './../pipelines/dtos/create-pipeline.dto';
 import { CreateBitbucketRepositoryRequestDto } from './dto/create-bitbucket-repository-request.dto';
 import { CreateBitbucketRepositoryResponseDto } from './dto/create-bitbucket-repository-reponse.dto';
 import { handleAxiosError } from '../common/errors/axios-error-handler';
 import { ConfigService } from '../config/config.service';
+import { Logger } from 'winston';
 
 @Injectable()
 export class BitbucketService {
-  private logger = new Logger('BitbucketService');
-
   constructor(
     private httpService: HttpService,
     private readonly configService: ConfigService,
+    @Inject('winston') private readonly logger: Logger,
   ) {}
 
   async createRepository(
@@ -22,11 +22,16 @@ export class BitbucketService {
       createPipelineDto,
     );
     try {
-      this.logger.verbose(
-        `Creating Bitbucket repository. Data: ${JSON.stringify(
-          createBitbucketRepositoryRequestDto,
-        )}`,
+      this.logger.debug(
+        `Creating Bitbucket repository for project ${
+          createPipelineDto.projectName
+        }.`,
+        {
+          label: 'BitbucketService : createRepository',
+          request: createBitbucketRepositoryRequestDto,
+        },
       );
+
       const createBitbucketRepositoryResponseDto: CreateBitbucketRepositoryResponseDto = await this.httpService
         .post(
           `/projects/${this.configService.bitbucketProject}/repos`,
@@ -34,10 +39,15 @@ export class BitbucketService {
         )
         .pipe(map(response => response.data))
         .toPromise();
-      this.logger.verbose(
-        `Created Bitbucket repository. Data: ${JSON.stringify(
-          createBitbucketRepositoryResponseDto,
-        )}`,
+
+      this.logger.debug(
+        `Created Bitbucket repository for project ${
+          createPipelineDto.projectName
+        }.`,
+        {
+          label: 'BitbucketService : createRepository',
+          repository: createBitbucketRepositoryResponseDto,
+        },
       );
       return createBitbucketRepositoryResponseDto;
     } catch (error) {

@@ -6,8 +6,46 @@ import { JiraService } from './jira/jira.service';
 import { PipelinesModule } from './pipelines/pipelines.module';
 import { ConfluenceModule } from './confluence/confluence.module';
 import { BitbucketModule } from './bitbucket/bitbucket.module';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
+const logFormat = winston.format.printf(
+  info =>
+    `${info.timestamp} ${info.level} [${
+      info.label ? info.label : 'PipelineBootstrap'
+    }]: ${info.message}`,
+);
 @Module({
-  imports: [PipelineRequestsModule, JiraModule, ConfigModule, PipelinesModule, ConfluenceModule, BitbucketModule],
+  imports: [
+    PipelineRequestsModule,
+    JiraModule,
+    ConfigModule,
+    PipelinesModule,
+    ConfluenceModule,
+    BitbucketModule,
+    WinstonModule.forRoot({
+      level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+      format: winston.format.combine(
+        // Allows for log label to be overridden
+        // winston.format.label({
+        //   label: 'PipelineBootstrap',
+        // }),
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.metadata({
+          fillExcept: ['message', 'level', 'timestamp', 'label'],
+        }),
+      ),
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(winston.format.colorize(), logFormat),
+        }),
+        new winston.transports.File({
+          filename: 'combined.log',
+          format: winston.format.combine(winston.format.json()),
+        }),
+      ],
+      exitOnError: false,
+    }),
+  ],
 })
 export class AppModule {}

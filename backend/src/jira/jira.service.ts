@@ -2,7 +2,7 @@ import {
   Injectable,
   HttpService,
   InternalServerErrorException,
-  Logger,
+  Inject,
 } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { JiraProjectTemplateKey } from './jira-project-template-key.enum';
@@ -18,27 +18,34 @@ import { handleAxiosError } from '../common/errors/axios-error-handler';
 import { GetJiraIssueTransitionsDto } from './dto/get-jira-issue-transitions-response.dto';
 import { ConfigService } from '../config/config.service';
 import { CreateJiraIssueRequestDto } from './dto/create-jira-issue-request.dto';
+import { Logger } from 'winston';
 
 @Injectable()
 export class JiraService {
-  private logger = new Logger('JiraService');
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    @Inject('winston') private readonly logger: Logger,
   ) {}
 
   async getIssues(jqlQuery: string): Promise<GetJiraIssueResponseDto[]> {
     try {
-      this.logger.verbose(`Retrieving Jira issues. Query: ${jqlQuery}`);
+      this.logger.debug(`Retrieving Jira with jql search query.`, {
+        label: 'JiraService : getIssues',
+        query: jqlQuery,
+      });
+
       const data = await this.httpService
         .get(`/search?jql=${jqlQuery}`)
         .pipe(map(response => response.data.issues))
         .toPromise();
-      this.logger.verbose(
-        `Retrieved Jira issues. Query: ${jqlQuery} Data: ${JSON.stringify(
-          data,
-        )}`,
-      );
+
+      this.logger.debug(`Retrieved Jira issues from jql search query.`, {
+        label: 'JiraService : getIssues',
+        query: jqlQuery,
+        results: data,
+      });
+
       return data;
     } catch (error) {
       handleAxiosError(error);
@@ -47,14 +54,20 @@ export class JiraService {
 
   async getIssueById(id: string): Promise<GetJiraIssueResponseDto> {
     try {
-      this.logger.verbose(`Retrieving Jira issue. Id: ${id}`);
+      this.logger.debug(`Retrieving Jira issue with id: ${id}`, {
+        label: 'JiraService : getIssueById',
+      });
+
       const data = await this.httpService
         .get(`/issue/${id}`)
         .pipe(map(response => response.data))
         .toPromise();
-      this.logger.verbose(
-        `Retrieved Jira Issue. Id: ${id} Data: ${JSON.stringify(data)}`,
-      );
+
+      this.logger.debug(`Retrieved Jira issue with id: ${id}`, {
+        label: 'JiraService : getIssueById',
+        result: data,
+      });
+
       return data;
     } catch (error) {
       handleAxiosError(error);
@@ -74,18 +87,28 @@ export class JiraService {
         issueType,
         jiraProjectKey,
       );
-      this.logger.verbose(
-        `Creating Jira issue. Project: ${jiraProjectKey} Data: ${createJiraIssueRequestDto}`,
+
+      this.logger.debug(
+        `Creating Jira issue in Jira project: ${jiraProjectKey}`,
+        {
+          label: 'JiraService : createIssue',
+          issue: createJiraIssueRequestDto,
+        },
       );
+
       const data: CreateJiraIssueResponseDto = await this.httpService
         .post(`/issue`, createJiraIssueRequestDto)
         .pipe(map(response => response.data))
         .toPromise();
-      this.logger.verbose(
-        `Created Jira issue. Id: ${
-          data.key
-        }. Project: ${jiraProjectKey} Data: ${data}`,
+
+      this.logger.debug(
+        `Created Jira issue id: ${data.key} in Jira project: ${jiraProjectKey}`,
+        {
+          label: 'JiraService : createIssue',
+          issue: data,
+        },
       );
+
       return data;
     } catch (error) {
       handleAxiosError(error);
@@ -96,14 +119,19 @@ export class JiraService {
     projectIdOrKey: string,
   ): Promise<GetJiraProjectResponseDto> {
     try {
-      this.logger.verbose(`Retrieving Jira project: ${projectIdOrKey}`);
+      this.logger.debug(`Retrieving Jira project id: ${projectIdOrKey}`, {
+        label: 'JiraService : getProjectById',
+      });
+
       const data = await this.httpService
         .get(`/project/${projectIdOrKey}`)
         .pipe(map(response => response.data))
         .toPromise();
-      this.logger.verbose(
-        `Retrieved Jira project: ${projectIdOrKey} Data: ${data}`,
-      );
+
+      this.logger.debug(`Retrieved Jira project: ${projectIdOrKey}`, {
+        label: 'JiraService : getProjectById',
+        project: data,
+      });
       return data;
     } catch (error) {
       handleAxiosError(error);
@@ -119,18 +147,21 @@ export class JiraService {
       createPipelineDto,
     );
     try {
-      this.logger.verbose(
-        `Creating Jira project. Data: ${JSON.stringify(
-          createJiraProjectRequestDto,
-        )}`,
+      this.logger.debug(
+        `Creating Jira project for ${createJiraProjectRequestDto.name}.`,
+        {
+          label: 'JiraService : createProject',
+          project: createJiraProjectRequestDto,
+        },
       );
-      // Await initial project creation
+
+      /* Create Jira project */
       createJiraProjectResponseDto = await this.httpService
         .post(`/project`, createJiraProjectRequestDto)
         .pipe(map(response => response.data))
         .toPromise();
 
-      // Optionally add administrators to project
+      /* Optionally add administrators to project */
       if (createPipelineDto.projectTechLead) {
         addActorsJiraProjectResponseDto = await this.addAdministratorsToProject(
           createJiraProjectResponseDto.key,
@@ -138,10 +169,14 @@ export class JiraService {
         );
       }
 
-      this.logger.verbose(
-        `Created Jira project. Data: ${JSON.stringify(
-          createJiraProjectResponseDto,
-        )}`,
+      this.logger.debug(
+        `Created Jira project: ${createJiraProjectResponseDto.key} for ${
+          createJiraProjectRequestDto.name
+        }.`,
+        {
+          label: 'JiraService : createProject',
+          project: createJiraProjectResponseDto,
+        },
       );
     } catch (error) {
       handleAxiosError(error);
@@ -153,35 +188,54 @@ export class JiraService {
 
   async deleteProject(projectIdOrKey: string) {
     try {
-      this.logger.verbose(`Deleting project: ${projectIdOrKey}`);
+      // this.logger.verbose(`Deleting project: ${projectIdOrKey}`);
       const data = await this.httpService
         .delete(`/project/${projectIdOrKey}`)
         .pipe(map(response => response.data))
         .toPromise();
-      this.logger.verbose(`Deleted project: ${projectIdOrKey}`);
+      // this.logger.verbose(`Deleted project: ${projectIdOrKey}`);
       return data;
     } catch (error) {
       handleAxiosError(error);
     }
   }
 
-  /* Private Helper Functions */
-  private async transitionIssueToDone(issueIdOrKey: string) {
+  /* Private / Helper Functions */
+  async transitionIssueToDone(issueIdOrKey: string) {
     try {
       const getIssueTransitionsDto: GetJiraIssueTransitionsDto = await this.getIssueTransitions(
         issueIdOrKey,
       );
+
       const doneTransition = getIssueTransitionsDto.transitions.find(
         transition => transition.name === this.configService.jiraIssueDoneLabel,
       );
+
       if (doneTransition) {
-        return await this.httpService.post(`/${issueIdOrKey}/transitions`, {
-          transition: {
-            id: doneTransition.id,
-          },
+        this.logger.debug(`Transitioning issue id: ${issueIdOrKey} to Done.`, {
+          label: 'JiraService : transitionIssueToDone',
         });
+
+        const transition = await this.httpService
+          .post(`/issue/${issueIdOrKey}/transitions`, {
+            transition: {
+              id: doneTransition.id,
+            },
+          })
+          .pipe(map(response => response.data))
+          .toPromise();
+
+        this.logger.debug(`Transitioned issue id: ${issueIdOrKey} to Done.`, {
+          label: 'JiraService : transitionIssueToDone',
+        });
+
+        console.log(transition);
+        return transition;
       } else {
-        // Throw exception where Transition does not exist
+        this.logger.warn(
+          `Unable to transition to Done. Transition not found for issue id: ${issueIdOrKey}`,
+          { label: 'JiraService : transitionIssueToDone' },
+        );
       }
     } catch (error) {
       handleAxiosError(error);
@@ -191,11 +245,24 @@ export class JiraService {
   private async getIssueTransitions(
     issueIdOrKey: string,
   ): Promise<GetJiraIssueTransitionsDto> {
+    this.logger.debug(
+      `Retrieving issue transition options for issue id: ${issueIdOrKey}`,
+      { label: 'JiraService getIssueTransitions: getIssueTransitions' },
+    );
     try {
-      return await this.httpService
-        .get(`/${issueIdOrKey}/transitions`)
+      const jiraIssueTransitions: GetJiraIssueTransitionsDto = await this.httpService
+        .get(`/issue/${issueIdOrKey}/transitions`)
         .pipe(map(response => response.data))
         .toPromise();
+
+      this.logger.debug(
+        `Retrieved issue transition options for issue id: ${issueIdOrKey}`,
+        {
+          label: 'JiraService getIssueTransitions: getIssueTransitions',
+          issueTransitions: jiraIssueTransitions,
+        },
+      );
+      return jiraIssueTransitions;
     } catch (error) {
       handleAxiosError(error);
     }
@@ -221,11 +288,11 @@ export class JiraService {
     projectId: string,
     administrators: string[],
   ): Promise<AddActorsJiraProjectResponseDto> {
-    this.logger.verbose(
-      `Adding administrators Jira Project: ${projectId}. Administrators: ${JSON.stringify(
-        administrators,
-      )}`,
-    );
+    // this.logger.verbose(
+    //   `Adding administrators Jira Project: ${projectId}. Administrators: ${JSON.stringify(
+    //     administrators,
+    //   )}`,
+    // );
     // Get the ID of Administrators role of the created project
     const projectRoles = await this.getProjectRoles(projectId);
 
@@ -243,11 +310,11 @@ export class JiraService {
           .pipe(map(response => response.data))
           .toPromise();
 
-        this.logger.verbose(
-          `Added administrators to Jira Project: ${projectId}. Data: ${JSON.stringify(
-            addActorsJiraProjectRoleResponseDto,
-          )}`,
-        );
+        // this.logger.verbose(
+        //   `Added administrators to Jira Project: ${projectId}. Data: ${JSON.stringify(
+        //     addActorsJiraProjectRoleResponseDto,
+        //   )}`,
+        // );
         return addActorsJiraProjectRoleResponseDto;
       } catch (error) {
         console.log(`Error adding admins to projectId: ${projectId}`, error);
