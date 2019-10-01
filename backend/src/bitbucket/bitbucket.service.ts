@@ -10,7 +10,7 @@ import { Logger } from 'winston';
 @Injectable()
 export class BitbucketService {
   constructor(
-    private httpService: HttpService,
+    private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     @Inject('winston') private readonly logger: Logger,
   ) {}
@@ -58,11 +58,14 @@ export class BitbucketService {
   async deleteRepository(repositorySlug: string) {
     try {
       this.logger.verbose(`Deleting repository: ${repositorySlug}`);
-      const data = await this.httpService.delete(
-        `/projects/${
-          this.configService.bitbucketProject
-        }/repos/${repositorySlug}`,
-      );
+      const data = await this.httpService
+        .delete(
+          `/projects/${
+            this.configService.bitbucketProject
+          }/repos/${repositorySlug}`,
+        )
+        .pipe(map(response => response.data))
+        .toPromise();
       this.logger.verbose(`Deleted repository: ${repositorySlug}`);
       return data;
     } catch (error) {

@@ -18,8 +18,10 @@ import { Logger } from 'winston';
 @Controller('pipeline-requests')
 export class PipelineRequestsController {
   constructor(
-    private pipelineRequestsService: PipelineRequestsService,
-    @Inject('winston') private readonly logger: Logger,
+    @Inject('PipelineRequestsService')
+    private readonly pipelineRequestsService: PipelineRequestsService,
+    @Inject('winston')
+    private readonly logger: Logger,
   ) {}
 
   @Get()

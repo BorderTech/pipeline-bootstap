@@ -38,8 +38,8 @@ export interface CreateConfluenceSpaceResponseDto {
   key: string;
   name: string;
   description: Description;
-  homepage: Homepage;
-  type: string;
+  homepage?: Homepage;
+  type?: string;
   _links: Links;
-  _expandable: Expandable;
+  _expandable?: Expandable;
 }

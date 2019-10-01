@@ -32,11 +32,11 @@ export class CreatePipelineRequestDto {
 
   @ApiModelProperty()
   @IsOptional()
-  kanbanBoardRequired: boolean;
+  kanbanBoardRequired?: boolean;
 
   @ApiModelProperty()
   @IsOptional()
-  projectManagementRequired: boolean;
+  projectManagementRequired?: boolean;
 
   @ApiModelProperty()
   @IsNotEmpty()
