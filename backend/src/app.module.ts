@@ -7,6 +7,7 @@ import { PipelinesModule } from './pipelines/pipelines.module';
 import { ConfluenceModule } from './confluence/confluence.module';
 import { BitbucketModule } from './bitbucket/bitbucket.module';
 import { WinstonModule } from 'nest-winston';
+import { JenkinsModule } from './jenkins/jenkins.module';
 import * as winston from 'winston';
 
 const logFormat = winston.format.printf(
@@ -46,6 +47,7 @@ const logFormat = winston.format.printf(
       ],
       exitOnError: false,
     }),
+    JenkinsModule,
   ],
 })
 export class AppModule {}

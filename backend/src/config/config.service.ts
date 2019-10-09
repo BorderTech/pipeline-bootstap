@@ -18,6 +18,8 @@ export class ConfigService {
     return this.envConfig.NODE_ENV;
   }
 
+  /*********** JIRA *************/
+
   get jiraUsername(): string {
     return this.envConfig.JIRA_USERNAME;
   }
@@ -50,6 +52,8 @@ export class ConfigService {
     return this.envConfig.JIRA_PIPELINE_REQUEST_SUMMARY_TEXT;
   }
 
+  /*********** CONFLUENCE *************/
+
   get confluenceUsername(): string {
     return this.envConfig.CONFLUENCE_USERNAME;
   }
@@ -61,6 +65,8 @@ export class ConfigService {
   get confluenceBaseURL(): string {
     return this.envConfig.CONFLUENCE_BASE_URL;
   }
+
+  /*********** BITBUCKET *************/
 
   get bitbucketUsername(): string {
     return this.envConfig.BITBUCKET_USERNAME;
@@ -80,6 +86,20 @@ export class ConfigService {
 
   get bitbucketProject(): string {
     return this.envConfig.BITBUCKET_PROJECT;
+  }
+
+  /*********** JENKINS *************/
+
+  get jenkinsUsername(): string {
+    return this.envConfig.JENKINS_USERNAME;
+  }
+
+  get jenkinsPassword(): string {
+    return this.envConfig.JENKINS_PASSWORD;
+  }
+
+  get jenkinsBaseURL(): string {
+    return this.envConfig.JENKINS_BASE_URL;
   }
 
   /**
@@ -110,6 +130,10 @@ export class ConfigService {
       BITBUCKET_PROJECT: Joi.string().required(),
       BITBUCKET_USERNAME: Joi.string().required(),
       BITBUCKET_PASSWORD: Joi.string().required(),
+
+      JENKINS_BASE_URL: Joi.string().required(),
+      JENKINS_USERNAME: Joi.string().required(),
+      JENKINS_PASSWORD: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
