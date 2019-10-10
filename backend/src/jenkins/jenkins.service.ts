@@ -1,9 +1,8 @@
-import { Injectable, HttpService } from '@nestjs/common';
-import { CreatePipelineDto } from '../pipelines/dtos/create-pipeline.dto';
+import { Injectable, HttpService, HttpException } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { Parser, Builder } from 'xml2js';
-import { handleAxiosError } from '../common/errors/axios-error-handler';
 import { GetAuthCrumbsDto } from './dto/get-auth-crumbs.dto';
+import * as cheerio from 'cheerio';
 
 @Injectable()
 export class JenkinsService {
@@ -26,13 +25,44 @@ export class JenkinsService {
         .pipe(map(response => response.data))
         .toPromise();
       // Update Git URL & return jobConfig as JSON
-      return await this.updateJobGitUrl(
-        newJobName,
-        gitRepoUrl,
-        authCrumbHeader,
-      );
+      return await this.updateJobGitUrl(newJobName, gitRepoUrl);
     } catch (error) {
-      handleAxiosError(error);
+      this.handleJenkinsResponseError(error);
+    }
+  }
+
+  async deleteJob(jobName: string) {
+    try {
+      const authCrumbHeader = await this.makeAuthCrumbHeader();
+
+      const deleteJob = await this.httpService
+        .post(`job/${jobName}/doDelete`, {}, { headers: authCrumbHeader })
+        .pipe(map(response => response.data))
+        .toPromise();
+
+      return;
+    } catch (error) {
+      this.handleJenkinsResponseError(error);
+    }
+  }
+
+  private handleJenkinsResponseError(error) {
+    if (error.response) {
+      // Extract the error from the HTML returned by Jenkins
+      // Error is returned as <h1>Error</h1><p>Error message here...</p>
+      const $ = cheerio.load(error.response.data);
+      const errorMessage = $('h1')
+        .filter(function() {
+          return (
+            $(this)
+              .text()
+              .trim() === 'Error'
+          );
+        })
+        .next()
+        .text();
+      // Throw error to the parent exception handler
+      throw new HttpException(errorMessage, error.response.status);
     }
   }
 
@@ -51,17 +81,12 @@ export class JenkinsService {
       .toPromise();
   }
 
-  private async updateJobGitUrl(
-    jobName: string,
-    gitRepoUrl: string,
-    authCrumbHeader,
-  ) {
+  private async updateJobGitUrl(jobName: string, gitRepoUrl: string) {
     const builder: Builder = new Builder();
     try {
       const authCrumbHeader = await this.makeAuthCrumbHeader();
       //Get config of job as JSON
       const jobConfigJson = await this.getJobConfigAsJson(jobName);
-      console.log(JSON.stringify(jobConfigJson));
       //Update remote gitRepoUrl
       jobConfigJson[
         'org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject'
@@ -81,7 +106,7 @@ export class JenkinsService {
       // Return the updates config as JSON
       return await this.getJobConfigAsJson(jobName);
     } catch (error) {
-      handleAxiosError(error);
+      this.handleJenkinsResponseError(error);
     }
   }
 
@@ -95,34 +120,7 @@ export class JenkinsService {
       //Parse to JSON from XML
       return await parser.parseStringPromise(jobConfigXml);
     } catch (error) {
-      handleAxiosError(error);
-    }
-  }
-
-  async createJob(createPipelineDto: CreatePipelineDto) {
-    const parser: Parser = new Parser();
-    const builder: Builder = new Builder();
-    const jobName = 'PipeReqTestCopy';
-    const gitRepo = 'something else';
-
-    const data = await this.httpService
-      .get(`job/${jobName}/config.xml`)
-      .pipe(map(response => response.data))
-      .toPromise();
-
-    try {
-      //XML to JSON
-      let json = await parser.parseStringPromise(data);
-      // Update Git Repository
-      json[
-        'org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject'
-      ].sources[0].data[0][
-        'jenkins.branch.BranchSource'
-      ][0].source[0].remote[0] = gitRepo;
-      //JSON to XML
-      const xml = builder.buildObject(json);
-    } catch (error) {
-      console.log(error);
+      this.handleJenkinsResponseError(error);
     }
   }
 }
