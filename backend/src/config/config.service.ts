@@ -102,6 +102,10 @@ export class ConfigService {
     return this.envConfig.JENKINS_BASE_URL;
   }
 
+  get jenkinsCopyFromJobName(): string {
+    return this.envConfig.JENKINS_COPY_FROM_JOB_NAME;
+  }
+
   /**
    * Ensures all needed variables are set, and returns the validated JavaScript object
    * including the applied default values.
@@ -134,6 +138,7 @@ export class ConfigService {
       JENKINS_BASE_URL: Joi.string().required(),
       JENKINS_USERNAME: Joi.string().required(),
       JENKINS_PASSWORD: Joi.string().required(),
+      JENKINS_COPY_FROM_JOB_NAME: Joi.string().required(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(

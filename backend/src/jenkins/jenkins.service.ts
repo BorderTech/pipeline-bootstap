@@ -3,16 +3,21 @@ import { map } from 'rxjs/operators';
 import { Parser, Builder } from 'xml2js';
 import { GetAuthCrumbsDto } from './dto/get-auth-crumbs.dto';
 import * as cheerio from 'cheerio';
+import { CreateJenkinsResponseDto } from './dto/create-jenkins-job-response.dto';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class JenkinsService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async copyJob(
     newJobName: string,
     existingJobName: string,
     gitRepoUrl: string,
-  ) {
+  ): Promise<CreateJenkinsResponseDto> {
     try {
       const authCrumbHeader = await this.makeAuthCrumbHeader();
       // Copy job from existing
@@ -25,7 +30,15 @@ export class JenkinsService {
         .pipe(map(response => response.data))
         .toPromise();
       // Update Git URL & return jobConfig as JSON
-      return await this.updateJobGitUrl(newJobName, gitRepoUrl);
+      const updatedJobConfig = await this.updateJobGitUrl(
+        newJobName,
+        gitRepoUrl,
+      );
+
+      return {
+        name: newJobName,
+        url: `${this.configService.jenkinsBaseURL}job/${newJobName}`,
+      };
     } catch (error) {
       this.handleJenkinsResponseError(error);
     }

@@ -8,7 +8,9 @@ import { BitbucketService } from '../bitbucket/bitbucket.service';
 import { CreateConfluenceSpaceResponseDto } from '../confluence/dto/create-space-request.dto';
 import { CreateBitbucketRepositoryResponseDto } from '../bitbucket/dto/create-bitbucket-repository-reponse.dto';
 import { CreatePipelineResponseDto } from './dtos/create-pipeline-response.dto';
+import { JenkinsService } from '../jenkins/jenkins.service';
 import { Logger } from 'winston';
+import { CreateJenkinsResponseDto } from '../jenkins/dto/create-jenkins-job-response.dto';
 
 @Injectable()
 export class PipelinesService {
@@ -16,6 +18,7 @@ export class PipelinesService {
     private jiraService: JiraService,
     private confluenceService: ConfluenceService,
     private bitbucketService: BitbucketService,
+    private jenkinsService: JenkinsService,
     private configService: ConfigService,
     @Inject('winston') private readonly logger: Logger,
   ) {}
@@ -24,6 +27,7 @@ export class PipelinesService {
     let getJiraProjectResponseDto: GetJiraProjectResponseDto;
     let getConfluenceSpaceResponseDto: CreateConfluenceSpaceResponseDto;
     let getBitbucketRepositoryResponseDto: CreateBitbucketRepositoryResponseDto;
+    let getJenkinsJobResponseDto: CreateJenkinsResponseDto;
 
     this.logger.debug(
       `Creating pipeline for project: ${createPipelineDto.projectName}`,
@@ -42,10 +46,17 @@ export class PipelinesService {
       getConfluenceSpaceResponseDto = await this.confluenceService.createSpace(
         createPipelineDto,
       );
-      /* Conditionally create BitBucket repo & Jenkins pipeline */
+      /* Conditionally create BitBucket repo & Jenkins job */
       if (this.isSoftwareProject(createPipelineDto)) {
+        /* Bitbucket */
         getBitbucketRepositoryResponseDto = await this.bitbucketService.createRepository(
           createPipelineDto,
+        );
+        /* Jenkins */
+        getJenkinsJobResponseDto = await this.jenkinsService.copyJob(
+          getBitbucketRepositoryResponseDto.slug,
+          this.configService.jenkinsCopyFromJobName,
+          this.getSshGitUrl(getBitbucketRepositoryResponseDto),
         );
       }
 
@@ -65,6 +76,7 @@ export class PipelinesService {
         getJiraProjectResponseDto,
         getConfluenceSpaceResponseDto,
         getBitbucketRepositoryResponseDto,
+        getJenkinsJobResponseDto,
       );
     } catch (error) {
       /* Delete anything that was partially created in the event of a failure */
@@ -110,6 +122,7 @@ export class PipelinesService {
     getJiraProjectResponseDto,
     getConfluenceSpaceResponseDto,
     getBitbucketRepositoryResponseDto,
+    getJenkinsJobResponseDto,
   ): CreatePipelineResponseDto {
     let createPipelineResponseDto: CreatePipelineResponseDto = {};
     /* Jira */
@@ -141,7 +154,20 @@ export class PipelinesService {
         }/repos/${getBitbucketRepositoryResponseDto.slug}`,
       };
     }
+    /* Bitbucket */
+    if (getJenkinsJobResponseDto) {
+      createPipelineResponseDto.jenkins = {
+        ...getJenkinsJobResponseDto,
+      };
+    }
+
     return createPipelineResponseDto;
+  }
+
+  private getSshGitUrl(getBitbucketRepositoryResponseDto): string {
+    return getBitbucketRepositoryResponseDto.links.clone.find(link => {
+      return link.name == 'ssh';
+    }).href;
   }
 
   private isSoftwareProject(createPipelineDto) {

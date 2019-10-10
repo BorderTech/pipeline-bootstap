@@ -15,8 +15,14 @@ export interface Bitbucket {
   url: string;
 }
 
+export interface Jenkins {
+  name: string;
+  url: string;
+}
+
 export interface CreatePipelineResponseDto {
   jira?: Jira;
   confluence?: Confluence;
   bitbucket?: Bitbucket;
+  jenkins?: Jenkins;
 }
