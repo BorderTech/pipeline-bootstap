@@ -3,6 +3,7 @@ import { PipelineRequestsModule } from './pipeline-requests/pipeline-requests.mo
 import { JiraModule } from './jira/jira.module';
 import { ConfigModule } from './config/config.module';
 import { JiraService } from './jira/jira.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { PipelinesModule } from './pipelines/pipelines.module';
 import { ConfluenceModule } from './confluence/confluence.module';
 import { BitbucketModule } from './bitbucket/bitbucket.module';
@@ -24,6 +25,12 @@ const logFormat = winston.format.printf(
     PipelinesModule,
     ConfluenceModule,
     BitbucketModule,
+    TypeOrmModule.forRoot({
+      type: 'sqljs',
+      // database: 'db',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+    }),
     WinstonModule.forRoot({
       level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
       format: winston.format.combine(

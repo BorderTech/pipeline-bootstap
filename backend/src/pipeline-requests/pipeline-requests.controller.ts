@@ -10,10 +10,11 @@ import {
   Inject,
 } from '@nestjs/common';
 import { CreatePipelineRequestDto } from './dtos/create-pipeline-request.dto';
-import { PipelineRequest } from './pipeline-request.model';
+// import { PipelineRequest } from './pipeline-request.model';
 import { PipelineRequestsService } from './pipeline-requests.service';
 import { GetPipelineRequestFilterDto } from './dtos/get-pipeline-requests-fitler.dto';
 import { Logger } from 'winston';
+import { PipelineRequest } from './pipeline-request.entity';
 
 @Controller('pipeline-requests')
 export class PipelineRequestsController {

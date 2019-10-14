@@ -1,4 +1,4 @@
-import { PipelineRequestStatus } from '../pipeline-request-status.emum';
+import { PipelineRequestStatus } from '../pipeline-request-status.enum';
 import { IsOptional, IsIn } from 'class-validator';
 
 export class GetPipelineRequestFilterDto {

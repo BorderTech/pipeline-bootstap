@@ -24,6 +24,7 @@
     "@nestjs/core": "^6.7.2",
     "@nestjs/platform-express": "^6.7.2",
     "@nestjs/swagger": "^3.1.0",
+    "@nestjs/typeorm": "^6.2.0",
     "@types/cheerio": "^0.22.13",
     "@types/xml2js": "^0.4.5",
     "cheerio": "^1.0.0-rc.3",
@@ -36,7 +37,9 @@
     "remove": "^0.1.5",
     "rimraf": "^2.6.2",
     "rxjs": "^6.5.3",
+    "sql.js": "^1.0.0",
     "swagger-ui-express": "^4.1.1",
+    "typeorm": "^0.2.19",
     "winston": "^3.2.1",
     "xml2js": "^0.4.22"
   },
