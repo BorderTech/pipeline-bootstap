@@ -1,10 +1,31 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsArray, IsOptional } from 'class-validator';
 
+class SoftwareMetadata {
+  @ApiModelProperty()
+  @IsArray()
+  projectTechLead: string[];
+
+  @ApiModelProperty()
+  language: string;
+
+  @ApiModelProperty()
+  kanbanBoardRequired: boolean;
+}
+
+class BusinessMetadata {
+  @ApiModelProperty()
+  projectManagementRequired: boolean;
+}
+
 export class CreatePipelineRequestDto {
   @ApiModelProperty()
   @IsNotEmpty({ message: 'Project Type should not be empty.' }) // example of custom message
   projectType: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
+  requestor: string;
 
   @ApiModelProperty()
   @IsNotEmpty()
@@ -23,22 +44,14 @@ export class CreatePipelineRequestDto {
   projectLead: string;
 
   @ApiModelProperty()
-  @IsArray()
-  projectTechLead: string[];
-
-  @ApiModelProperty()
-  @IsOptional()
-  language: string;
-
-  @ApiModelProperty()
-  @IsOptional()
-  kanbanBoardRequired?: boolean;
-
-  @ApiModelProperty()
-  @IsOptional()
-  projectManagementRequired?: boolean;
-
-  @ApiModelProperty()
   @IsNotEmpty()
   wbsCode: string;
+
+  @ApiModelProperty()
+  @IsOptional()
+  businessMetadata: BusinessMetadata;
+
+  @ApiModelProperty()
+  @IsOptional()
+  softwareMetadata: SoftwareMetadata;
 }

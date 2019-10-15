@@ -1,28 +1,44 @@
-interface Jira {
+import { ApiModelProperty } from '@nestjs/swagger';
+
+class Jira {
+  @ApiModelProperty()
   key: string;
+  @ApiModelProperty()
   name: string;
+  @ApiModelProperty()
   url: string;
 }
 
-interface Confluence {
+class Confluence {
+  @ApiModelProperty()
   key: string;
+  @ApiModelProperty()
   name: string;
+  @ApiModelProperty()
   url: string;
 }
 
-export interface Bitbucket {
+export class Bitbucket {
+  @ApiModelProperty()
   name: string;
+  @ApiModelProperty()
   url: string;
 }
 
-export interface Jenkins {
+export class Jenkins {
+  @ApiModelProperty()
   name: string;
+  @ApiModelProperty()
   url: string;
 }
 
-export interface CreatePipelineResponseDto {
+export class CreatePipelineResponseDto {
+  @ApiModelProperty()
   jira?: Jira;
+  @ApiModelProperty()
   confluence?: Confluence;
+  @ApiModelProperty()
   bitbucket?: Bitbucket;
+  @ApiModelProperty()
   jenkins?: Jenkins;
 }

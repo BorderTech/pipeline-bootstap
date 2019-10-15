@@ -7,58 +7,57 @@ import {
   IsBoolean,
 } from 'class-validator';
 
-export class CreatePipelineDto {
-  @ApiModelProperty()
-  @IsNotEmpty()
-  @IsString()
-  id: string;
-
-  @ApiModelProperty()
-  @IsNotEmpty() // example of custom message
-  @IsString()
-  projectType: string;
-
-  @ApiModelProperty()
-  @IsNotEmpty()
-  @IsString()
-  projectName: string;
-
-  @ApiModelProperty()
-  @IsNotEmpty()
-  @IsString()
-  projectDescription: string;
-
-  @ApiModelProperty()
-  @IsNotEmpty()
-  @IsString()
-  orgUnit: string;
-
-  @ApiModelProperty()
-  @IsNotEmpty()
-  @IsString()
-  projectLead: string;
-
+class SoftwareMetadata {
   @ApiModelProperty()
   @IsArray()
   projectTechLead: string[];
 
   @ApiModelProperty()
-  @IsOptional()
-  @IsString()
   language: string;
 
   @ApiModelProperty()
-  @IsOptional()
-  @IsBoolean()
-  kanbanBoardRequired?: boolean;
+  kanbanBoardRequired: boolean;
+}
 
+class BusinessMetadata {
   @ApiModelProperty()
-  @IsOptional()
-  @IsBoolean()
-  projectManagementRequired?: boolean;
+  projectManagementRequired: boolean;
+}
+
+export class CreatePipelineDto {
+  @ApiModelProperty()
+  @IsNotEmpty({ message: 'Project Type should not be empty.' }) // example of custom message
+  projectType: string;
 
   @ApiModelProperty()
   @IsNotEmpty()
-  @IsString()
+  requestor: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
+  projectName: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
+  projectDescription: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
+  orgUnit: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
+  projectLead: string;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
   wbsCode: string;
+
+  @ApiModelProperty()
+  @IsOptional()
+  businessMetadata: BusinessMetadata;
+
+  @ApiModelProperty()
+  @IsOptional()
+  softwareMetadata: SoftwareMetadata;
 }

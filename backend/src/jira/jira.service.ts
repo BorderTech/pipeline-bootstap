@@ -162,10 +162,10 @@ export class JiraService {
         .toPromise();
 
       /* Optionally add administrators to project */
-      if (createPipelineDto.projectTechLead) {
+      if (createPipelineDto.softwareMetadata.projectTechLead) {
         addActorsJiraProjectResponseDto = await this.addAdministratorsToProject(
           createJiraProjectResponseDto.key,
-          createPipelineDto.projectTechLead,
+          createPipelineDto.softwareMetadata.projectTechLead,
         );
       }
 
@@ -334,8 +334,8 @@ export class JiraService {
       projectTypeKey: createRequestDto.projectType,
       projectTemplateKey: this.generateProjectTemplateKey(
         createRequestDto.projectType,
-        createRequestDto.kanbanBoardRequired,
-        createRequestDto.projectManagementRequired,
+        createRequestDto.softwareMetadata.kanbanBoardRequired,
+        createRequestDto.businessMetadata.projectManagementRequired,
       ),
       description: createRequestDto.projectDescription,
       lead: createRequestDto.projectLead,

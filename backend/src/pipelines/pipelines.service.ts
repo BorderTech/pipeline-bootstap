@@ -23,7 +23,9 @@ export class PipelinesService {
     @Inject('winston') private readonly logger: Logger,
   ) {}
 
-  async createPipeline(createPipelineDto: CreatePipelineDto) {
+  async createPipeline(
+    createPipelineDto: CreatePipelineDto,
+  ): Promise<CreatePipelineResponseDto> {
     let getJiraProjectResponseDto: GetJiraProjectResponseDto;
     let getConfluenceSpaceResponseDto: CreateConfluenceSpaceResponseDto;
     let getBitbucketRepositoryResponseDto: CreateBitbucketRepositoryResponseDto;
@@ -69,7 +71,7 @@ export class PipelinesService {
       );
 
       /* Update PipelineRequest with URLs Jira Issue & Transition to Done */
-      this.jiraService.transitionIssueToDone(createPipelineDto.id);
+      // this.jiraService.transitionIssueToDone(createPipelineDto.id);
 
       /* Return pipelineResponseDto */
       return this.makePipelineResponseDto(

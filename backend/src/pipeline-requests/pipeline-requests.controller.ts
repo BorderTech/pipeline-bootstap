@@ -15,6 +15,7 @@ import { PipelineRequestsService } from './pipeline-requests.service';
 import { GetPipelineRequestFilterDto } from './dtos/get-pipeline-requests-fitler.dto';
 import { Logger } from 'winston';
 import { PipelineRequest } from './pipeline-request.entity';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('pipeline-requests')
 export class PipelineRequestsController {
@@ -26,6 +27,11 @@ export class PipelineRequestsController {
   ) {}
 
   @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'All PipelineRequests matching filter',
+    type: PipelineRequest,
+  })
   findAll(
     @Query() filterDto: GetPipelineRequestFilterDto,
   ): Promise<PipelineRequest[]> {
@@ -40,6 +46,11 @@ export class PipelineRequestsController {
   }
 
   @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The found PipelineRequest record',
+    type: PipelineRequest,
+  })
   findOne(@Param('id') id: string): Promise<PipelineRequest> {
     this.logger.debug(`User retrieving pipeline request with id: ${id}`, {
       label: 'PipelineRequestsController : findOne',
@@ -51,6 +62,11 @@ export class PipelineRequestsController {
 
   @Post()
   @UsePipes(ValidationPipe)
+  @ApiResponse({
+    status: 201,
+    description: 'The created PipelineRequest record',
+    type: PipelineRequest,
+  })
   createRequest(
     @Body() createRequestDto: CreatePipelineRequestDto,
   ): Promise<PipelineRequest> {

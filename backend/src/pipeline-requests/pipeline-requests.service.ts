@@ -30,7 +30,9 @@ export class PipelineRequestsService {
     }
   }
 
-  async createRequest(createRequestDto: CreatePipelineRequestDto) {
+  async createRequest(
+    createRequestDto: CreatePipelineRequestDto,
+  ): Promise<PipelineRequest> {
     try {
       this.logger.debug(
         `Creating pipeline request for project: ${
@@ -47,6 +49,7 @@ export class PipelineRequestsService {
       let businessMetadata = new PipelineRequestBusinessMetadata();
 
       //Both Software & Business projects
+      pipelineRequest.requestor = createRequestDto.requestor;
       pipelineRequest.projectName = createRequestDto.projectName;
       pipelineRequest.projectDescription = createRequestDto.projectDescription;
       pipelineRequest.projectType = createRequestDto.projectType;
@@ -59,7 +62,7 @@ export class PipelineRequestsService {
       // Business only
       if (createRequestDto.projectType === 'business') {
         businessMetadata.projectManagementRequired =
-          createRequestDto.kanbanBoardRequired;
+          createRequestDto.businessMetadata.projectManagementRequired;
 
         pipelineRequest.businessMetadata = businessMetadata;
       }
@@ -67,9 +70,10 @@ export class PipelineRequestsService {
       // Software only
       if (createRequestDto.projectType === 'software') {
         softwareMetadata.kanbanBoardRequired =
-          createRequestDto.kanbanBoardRequired;
-        softwareMetadata.projectTechLead = createRequestDto.projectTechLead;
-        softwareMetadata.language = createRequestDto.language;
+          createRequestDto.softwareMetadata.kanbanBoardRequired;
+        softwareMetadata.projectTechLead =
+          createRequestDto.softwareMetadata.projectTechLead;
+        softwareMetadata.language = createRequestDto.softwareMetadata.language;
 
         pipelineRequest.softwareMetadata = softwareMetadata;
       }
