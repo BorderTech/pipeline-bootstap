@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PipelineRequestsController } from './pipeline-requests.controller';
 import { PipelineRequestsService } from './pipeline-requests.service';
-import { PipelineRequest } from './pipeline-request.model';
+import { PipelineRequest } from './pipeline-request.entity';
 import { GetPipelineRequestFilterDto } from './dtos/get-pipeline-requests-fitler.dto';
 import { CreatePipelineRequestDto } from './dtos/create-pipeline-request.dto';
 
@@ -10,14 +10,20 @@ describe('PipelineRequestsController', () => {
   let service: PipelineRequestsService;
 
   const pipelineRequest: PipelineRequest = {
-    id: 'PIPEREQ-1',
+    id: 1,
+    requestor: 'Joe Citizen',
     projectType: 'software',
     projectName: 'Test Project',
     projectDescription: 'string',
     projectLead: 'ABC123',
-    projectTechLead: ['ABC123'],
-    language: 'Java',
-    kanbanBoardRequired: true,
+    softwareMetadata: {
+      id: 1,
+      projectTechLead: ['ABC123'],
+      language: 'Java',
+      kanbanBoardRequired: true,
+      pipelineRequest: null,
+    },
+    businessMetadata: null,
     created: new Date('2019-09-06'),
     status: 'To Do',
     wbsCode: '123456',
@@ -25,13 +31,17 @@ describe('PipelineRequestsController', () => {
   };
 
   const createPipelineRequest: CreatePipelineRequestDto = {
+    requestor: 'Joe Citizen',
     projectType: 'software',
     projectName: 'Test Project',
     projectDescription: 'string',
     projectLead: 'ABC123',
-    projectTechLead: ['ABC123'],
-    language: 'Java',
-    kanbanBoardRequired: true,
+    softwareMetadata: {
+      projectTechLead: ['ABC123'],
+      language: 'Java',
+      kanbanBoardRequired: true,
+    },
+    businessMetadata: null,
     wbsCode: '123456',
     orgUnit: 'string',
   };

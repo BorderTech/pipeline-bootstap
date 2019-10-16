@@ -87,15 +87,13 @@ export class PipelineRequestsService {
       );
 
       // Save pipelineRequest to DB
-      await this.pipelineRepository.save(pipelineRequest);
-
-      return pipelineRequest;
+      return await this.pipelineRepository.save(pipelineRequest);
     } catch (error) {
       console.log(error);
     }
   }
 
-  async findOne(id: string): Promise<PipelineRequest> {
+  async findOne(id: number): Promise<PipelineRequest> {
     this.logger.debug(`Retrieving pipeline request with id: ${id}`, {
       label: 'PipelineRequestsService : findOne',
     });

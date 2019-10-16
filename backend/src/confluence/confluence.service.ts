@@ -30,7 +30,7 @@ export class ConfluenceService {
           request: createConfluenceSpaceRequest,
         },
       );
-      const data: CreateConfluenceSpaceResponseDto = await this.httpService
+      const confluenceSpace: CreateConfluenceSpaceResponseDto = await this.httpService
         .post(`/space`, createConfluenceSpaceRequest)
         .pipe(map(response => response.data))
         .toPromise();
@@ -41,11 +41,11 @@ export class ConfluenceService {
         }.`,
         {
           label: 'ConfluenceService : createSpace',
-          space: data,
+          space: confluenceSpace,
         },
       );
 
-      return data;
+      return confluenceSpace;
     } catch (error) {
       handleAxiosError(error);
     }

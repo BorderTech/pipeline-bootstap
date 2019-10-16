@@ -66,6 +66,10 @@ export class ConfigService {
     return this.envConfig.CONFLUENCE_BASE_URL;
   }
 
+  get confluenceWebBaseURL(): string {
+    return this.envConfig.CONFLUENCE_WEB_BASE_URL;
+  }
+
   /*********** BITBUCKET *************/
 
   get bitbucketUsername(): string {
@@ -126,6 +130,7 @@ export class ConfigService {
       JIRA_PIPELINE_REQUEST_SUMMARY_TEXT: Joi.string().required(),
 
       CONFLUENCE_BASE_URL: Joi.string().required(),
+      CONFLUENCE_WEB_BASE_URL: Joi.string().required(),
       CONFLUENCE_USERNAME: Joi.string().required(),
       CONFLUENCE_PASSWORD: Joi.string().required(),
 

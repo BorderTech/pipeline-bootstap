@@ -59,14 +59,17 @@ const repository: CreateBitbucketRepositoryResponseDto = {
 };
 
 const createPipelineDto: CreatePipelineDto = {
-  id: 'PIPEREQ-1',
+  requestor: 'Joe Citizen',
   projectType: 'software',
   projectName: 'My repo',
   projectDescription: 'My repo description',
   projectLead: 'ABC123',
-  projectTechLead: ['ABC123'],
-  kanbanBoardRequired: true,
-  language: 'Java',
+  softwareMetadata: {
+    projectTechLead: ['ABC123'],
+    language: 'Java',
+    kanbanBoardRequired: true,
+  },
+  businessMetadata: null,
   orgUnit: 'PIPEREQ Test Project',
   wbsCode: '11111',
 };

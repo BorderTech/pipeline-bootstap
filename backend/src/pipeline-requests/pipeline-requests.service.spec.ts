@@ -3,121 +3,156 @@ import { PipelineRequestsService } from './pipeline-requests.service';
 import { GetPipelineRequestFilterDto } from './dtos/get-pipeline-requests-fitler.dto';
 import { JiraService } from '../jira/jira.service';
 import { CreatePipelineRequestDto } from './dtos/create-pipeline-request.dto';
+import { PipelineRequest } from './pipeline-request.entity';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { PipelineRequestStatus } from './pipeline-request-status.enum';
+
+export type MockType<T> = { [P in keyof T]: jest.Mock<{}> };
+// @ts-ignore
+export const repositoryMockFactory: () => MockType<Repository<any>> = jest.fn(
+  () => ({
+    findOne: jest.fn(entity => entity),
+    find: jest.fn(entity => entity),
+    save: jest.fn(entity => entity),
+  }),
+);
 
 describe('PipelineRequestsService', () => {
-  let app: TestingModule;
-  let pipelineRequestsService: PipelineRequestsService;
+  let service: PipelineRequestsService;
+  let repositoryMock: MockType<Repository<PipelineRequest>>;
 
   beforeAll(async () => {
-    const JiraServiceProvider = {
-      provide: JiraService,
-      useClass: JiraServiceMock,
-    };
-    app = await Test.createTestingModule({
-      providers: [PipelineRequestsService, JiraServiceProvider],
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        PipelineRequestsService,
+        {
+          provide: 'winston',
+          useFactory: () => require('winston'),
+        },
+        {
+          provide: getRepositoryToken(PipelineRequest),
+          useFactory: repositoryMockFactory,
+        },
+      ],
     }).compile();
-    pipelineRequestsService = app.get<PipelineRequestsService>(
-      PipelineRequestsService,
-    );
+    service = module.get<PipelineRequestsService>(PipelineRequestsService);
+    repositoryMock = module.get(getRepositoryToken(PipelineRequest));
   });
 
   describe('findAll', () => {
     it('should get an array of PipelineRequest', async () => {
-      const filterDto: GetPipelineRequestFilterDto = new GetPipelineRequestFilterDto();
-      const result = [
+      let filterDto: GetPipelineRequestFilterDto = new GetPipelineRequestFilterDto();
+      filterDto.status = PipelineRequestStatus.TODO;
+      const pipelineRequests: PipelineRequest[] = [
         {
-          id: 'KEY',
-          projectType: 'business',
+          id: 1,
+          requestor: 'Joe Citizen',
+          projectType: 'software',
           projectName: 'My First Project',
           projectDescription: 'Coolest project ever!',
           projectLead: 'ABC124',
-          projectTechLead: 'ABC144,GFD222',
+          softwareMetadata: {
+            id: 1,
+            projectTechLead: ['ABC144', 'GFD222'],
+            language: 'Java',
+            kanbanBoardRequired: true,
+            pipelineRequest: null,
+          },
+          businessMetadata: null,
           orgUnit: 'Some business unit',
           wbsCode: '11111',
+          status: 'To Do',
+          created: new Date(),
         },
       ];
-      expect(await pipelineRequestsService.findAll(filterDto)).toStrictEqual(
-        result,
-      );
+
+      repositoryMock.find.mockReturnValue(pipelineRequests);
+      expect(await service.findAll(filterDto)).toStrictEqual(pipelineRequests);
+      expect(repositoryMock.find).toHaveBeenCalledWith({
+        where: { status: filterDto.status },
+        relations: ['businessMetadata', 'softwareMetadata'],
+      });
     });
   });
 
   describe('findOne', () => {
     it('should get a PipelineRequest matching id', async () => {
-      const id = 'KEY';
-      const result = {
-        id: 'KEY',
-        projectType: 'business',
+      const pipelineRequest: PipelineRequest = {
+        id: 1,
+        requestor: 'Joe Citizen',
+        projectType: 'software',
         projectName: 'My First Project',
         projectDescription: 'Coolest project ever!',
         projectLead: 'ABC124',
-        projectTechLead: 'ABC144,GFD222',
+        softwareMetadata: {
+          id: 1,
+          projectTechLead: ['ABC144', 'GFD222'],
+          language: 'Java',
+          kanbanBoardRequired: true,
+          pipelineRequest: null,
+        },
+        businessMetadata: null,
         orgUnit: 'Some business unit',
         wbsCode: '11111',
+        status: 'To Do',
+        created: new Date(),
       };
-      expect(await pipelineRequestsService.findOne(id)).toStrictEqual(result);
+
+      repositoryMock.findOne.mockReturnValue(pipelineRequest);
+      expect(await service.findOne(pipelineRequest.id)).toEqual(
+        pipelineRequest,
+      );
+      expect(repositoryMock.findOne).toHaveBeenCalledWith({
+        relations: ['businessMetadata', 'softwareMetadata'],
+        where: { id: 1 },
+      });
     });
   });
 
   describe('createRequest', () => {
     it('should return a created PipelineRequest', async () => {
       const request: CreatePipelineRequestDto = {
+        requestor: 'Joe Citizen',
         projectType: 'software',
         projectName: 'My First Project',
         projectDescription: 'Coolest project ever!',
         projectLead: 'ABC124',
-        projectTechLead: ['ABC144', 'GFD222'],
         orgUnit: 'Some business unit',
         wbsCode: '11111',
-        language: 'Java',
-        kanbanBoardRequired: true,
+        softwareMetadata: {
+          projectTechLead: ['ABC144', 'GFD222'],
+          language: 'Java',
+          kanbanBoardRequired: true,
+        },
+        businessMetadata: null,
       };
-      const result = {
-        id: 'KEY',
+      const pipelineRequest: PipelineRequest = {
+        id: 1,
+        requestor: 'Joe Citizen',
         projectType: 'software',
         projectName: 'My First Project',
         projectDescription: 'Coolest project ever!',
         projectLead: 'ABC124',
-        projectTechLead: ['ABC144', 'GFD222'],
+        // @ts-ignore
+        softwareMetadata: {
+          id: 1,
+          projectTechLead: ['ABC144', 'GFD222'],
+          language: 'Java',
+          kanbanBoardRequired: true,
+        },
+        businessMetadata: null,
         orgUnit: 'Some business unit',
         wbsCode: '11111',
-        language: 'Java',
-        kanbanBoardRequired: true,
+        status: 'To Do',
+        created: new Date(),
       };
-      expect(
-        await pipelineRequestsService.createRequest(request),
-      ).toStrictEqual(result);
+
+      repositoryMock.save.mockReturnValue(pipelineRequest);
+
+      expect(await service.createRequest(request)).toStrictEqual(
+        pipelineRequest,
+      );
     });
   });
 });
-
-class JiraServiceMock {
-  async getPipelineRequestIssues(filterDto: GetPipelineRequestFilterDto) {
-    return [
-      {
-        key: 'KEY',
-        fields: {
-          description:
-            '{"projectType":"business","projectName":"My First Project","projectDescription":"Coolest project ever!","projectLead":"ABC124","projectTechLead":"ABC144,GFD222","orgUnit":"Some business unit","wbsCode":"11111"}',
-        },
-      },
-    ];
-  }
-  async getPipelineRequestIssue(id: string) {
-    return {
-      key: 'KEY',
-      fields: {
-        description:
-          '{"projectType":"business","projectName":"My First Project","projectDescription":"Coolest project ever!","projectLead":"ABC124","projectTechLead":"ABC144,GFD222","orgUnit":"Some business unit","wbsCode":"11111"}',
-      },
-    };
-  }
-
-  async createPipelineRequestIssue(id: string) {
-    return {
-      id: 'id',
-      key: 'KEY',
-      self: 'string',
-    };
-  }
-}

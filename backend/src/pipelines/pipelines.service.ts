@@ -142,7 +142,7 @@ export class PipelinesService {
       createPipelineResponseDto.confluence = {
         key: getConfluenceSpaceResponseDto.key,
         name: getConfluenceSpaceResponseDto.name,
-        url: `${getConfluenceSpaceResponseDto._links.base}/display/${
+        url: `${this.configService.confluenceWebBaseURL}/display/${
           getConfluenceSpaceResponseDto.key
         }`,
       };
