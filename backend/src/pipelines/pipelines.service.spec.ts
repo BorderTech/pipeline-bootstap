@@ -3,19 +3,34 @@ import { PipelinesService } from './pipelines.service';
 import * as path from 'path';
 import { ConfigService } from '../config/config.service';
 import { JiraService } from '../jira/jira.service';
-import { GetPipelineRequestFilterDto } from '../pipeline-requests/dtos/get-pipeline-requests-fitler.dto';
 import { ConfluenceService } from '../confluence/confluence.service';
 import { JenkinsService } from '../jenkins/jenkins.service';
 import { BitbucketService } from '../bitbucket/bitbucket.service';
 import { GetJiraProjectResponseDto } from '../jira/dto/get-jira-project-response.dto';
 import { CreatePipelineDto } from './dtos/create-pipeline.dto';
+import { Repository } from 'typeorm';
 import { CreateConfluenceSpaceResponseDto } from '../confluence/dto/create-confluence-space-response.dto';
 import { CreateBitbucketRepositoryResponseDto } from '../bitbucket/dto/create-bitbucket-repository-reponse.dto';
 import { CreateJenkinsResponseDto } from '../jenkins/dto/create-jenkins-job-response.dto';
+import { PipelineRequest } from '../pipeline-requests/pipeline-request.entity';
+import { Pipeline } from './pipeline.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { PipelineRequestsService } from '../pipeline-requests/pipeline-requests.service';
+
+export type MockType<T> = { [P in keyof T]: jest.Mock<{}> };
+// @ts-ignore
+export const repositoryMockFactory: () => MockType<Repository<any>> = jest.fn(
+  () => ({
+    findOne: jest.fn(entity => entity),
+    find: jest.fn(entity => entity),
+    save: jest.fn(entity => entity),
+  }),
+);
 
 describe('PipelinesService', () => {
   let service: PipelinesService;
   let configService: ConfigService;
+  let repositoryMock: MockType<Repository<Pipeline>>;
 
   beforeEach(async () => {
     const JiraServiceProvider = {
@@ -34,10 +49,11 @@ describe('PipelinesService', () => {
       provide: JenkinsService,
       useClass: JenkinsServiceMock,
     };
-    const envFilePath = path.join(
-      __dirname,
-      `../../${process.env.NODE_ENV || 'test'}.env`,
-    );
+    const PipelineRequestServiceProvider = {
+      provide: PipelineRequestsService,
+      useClass: PipelineRequestServiceMock,
+    };
+    const envFilePath = path.join(__dirname, `../../.env.example`);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -46,6 +62,7 @@ describe('PipelinesService', () => {
         ConfluenceServiceProvider,
         BitbucketServiceProvider,
         JenkinsServiceProvider,
+        PipelineRequestServiceProvider,
         {
           provide: ConfigService,
           useValue: new ConfigService(envFilePath),
@@ -54,11 +71,16 @@ describe('PipelinesService', () => {
           provide: 'winston',
           useFactory: () => require('winston'),
         },
+        {
+          provide: getRepositoryToken(Pipeline),
+          useFactory: repositoryMockFactory,
+        },
       ],
     }).compile();
 
     service = module.get<PipelinesService>(PipelinesService);
     configService = module.get<ConfigService>(ConfigService);
+    repositoryMock = module.get(getRepositoryToken(Pipeline));
   });
 
   it('should be defined', () => {
@@ -68,6 +90,7 @@ describe('PipelinesService', () => {
   describe('createPipeline', () => {
     it('should return create pipeline artifacts in shape of CreatePipelineResponseDto', async () => {
       const createPipeline: CreatePipelineDto = {
+        requestId: 1,
         requestor: 'Joe Citizen',
         projectType: 'software',
         projectName: 'My First Project',
@@ -83,27 +106,86 @@ describe('PipelinesService', () => {
         businessMetadata: null,
       };
       const expected = {
-        jira: {
-          key: 'EX',
-          name: 'Example',
-          url: `${configService.jiraWebBaseURL}/projects/EX`,
-        },
-        confluence: {
-          key: 'EX',
-          name: 'Example space',
-          url: `${configService.confluenceWebBaseURL}/display/EX`,
-        },
-        bitbucket: {
-          name: 'My repo',
-          url: `${
-            configService.bitbucketWebBaseURL
-          }/projects/REPO/repos/my-repo`,
-        },
-        jenkins: {
-          name: 'my-job',
-          url: 'http://jenkins.example.com/jenkins/job/my-job',
-        },
+        name: 'PIPEREQ Example Proj',
+        artefacts: [
+          {
+            type: 'JIRA',
+            key: 'PEP',
+            name: 'PIPEREQ Example Proj',
+            url: 'https://jira.example.com/projects/PEP',
+            id: 1,
+            pipeline: null,
+          },
+          {
+            type: 'CONFLUENCE',
+            key: 'PEP',
+            name: 'PIPEREQ Example Proj',
+            url: 'https://confluence.example.com/display/PEP',
+            id: 2,
+            pipeline: null,
+          },
+          {
+            type: 'BITBUCKET',
+            key: 'pipereq-example-proj',
+            name: 'PIPEREQ Example Proj',
+            url:
+              'https://bitbucket.example.com/projects/REPO/repos/pipereq-example-proj',
+            id: 3,
+            pipeline: null,
+          },
+          {
+            type: 'JENKINS',
+            key: 'pipereq-example-proj',
+            name: 'pipereq-example-proj',
+            url: 'https://jenkins.example.com/jenkins/job/pipereq-example-proj',
+            id: 4,
+            pipeline: null,
+          },
+        ],
+        id: 1,
       };
+
+      const pipeline: Pipeline = {
+        name: 'PIPEREQ Example Proj',
+        artefacts: [
+          {
+            type: 'JIRA',
+            key: 'PEP',
+            name: 'PIPEREQ Example Proj',
+            url: 'https://jira.example.com/projects/PEP',
+            id: 1,
+            pipeline: null,
+          },
+          {
+            type: 'CONFLUENCE',
+            key: 'PEP',
+            name: 'PIPEREQ Example Proj',
+            url: 'https://confluence.example.com/display/PEP',
+            id: 2,
+            pipeline: null,
+          },
+          {
+            type: 'BITBUCKET',
+            key: 'pipereq-example-proj',
+            name: 'PIPEREQ Example Proj',
+            url:
+              'https://bitbucket.example.com/projects/REPO/repos/pipereq-example-proj',
+            id: 3,
+            pipeline: null,
+          },
+          {
+            type: 'JENKINS',
+            key: 'pipereq-example-proj',
+            name: 'pipereq-example-proj',
+            url: 'https://jenkins.example.com/jenkins/job/pipereq-example-proj',
+            id: 4,
+            pipeline: null,
+          },
+        ],
+        id: 1,
+      };
+
+      repositoryMock.save.mockReturnValue(pipeline);
       expect(await service.createPipeline(createPipeline)).toStrictEqual(
         expected,
       );
@@ -331,6 +413,56 @@ class JenkinsServiceMock {
     return {
       name: 'my-job',
       url: 'http://jenkins.example.com/jenkins/job/my-job',
+    };
+  }
+}
+
+class PipelineRequestServiceMock {
+  async findOne(id: number): Promise<PipelineRequest> {
+    return {
+      id: 1,
+      requestor: 'ABC123',
+      projectType: 'software',
+      projectName: 'PIPEREQ Test Project',
+      projectDescription: 'PIPEREQ Test Project',
+      wbsCode: '11111',
+      orgUnit: 'PIPEREQ Test Project',
+      status: 'To Do',
+      projectLead: 'ABC123',
+      jiraIssueUrl: `https://jira.example.com/browse/PIPEREQ-1`,
+      created: new Date(),
+      businessMetadata: null,
+      softwareMetadata: {
+        id: 1,
+        kanbanBoardRequired: true,
+        projectTechLead: ['ABC123'],
+        language: 'Java',
+        pipelineRequest: null,
+      },
+    };
+  }
+
+  async updatePipelineRequestAsDone(id: number): Promise<PipelineRequest> {
+    return {
+      id: 1,
+      requestor: 'ABC123',
+      projectType: 'software',
+      projectName: 'PIPEREQ Test Project',
+      projectDescription: 'PIPEREQ Test Project',
+      wbsCode: '11111',
+      orgUnit: 'PIPEREQ Test Project',
+      status: 'Done',
+      projectLead: 'ABC123',
+      jiraIssueUrl: `https://jira.example.com/browse/PIPEREQ-1`,
+      created: new Date(),
+      businessMetadata: null,
+      softwareMetadata: {
+        id: 1,
+        kanbanBoardRequired: true,
+        projectTechLead: ['ABC123'],
+        language: 'Java',
+        pipelineRequest: null,
+      },
     };
   }
 }

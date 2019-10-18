@@ -32,6 +32,7 @@ export class PipelineRequestsController {
     description: 'All PipelineRequests matching filter',
     type: PipelineRequest,
   })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiImplicitQuery({ name: 'status', enum: ['To Do', 'Done'] })
   findAll(
     @Query() filterDto: GetPipelineRequestFilterDto,
@@ -52,6 +53,7 @@ export class PipelineRequestsController {
     description: 'The found PipelineRequest record',
     type: PipelineRequest,
   })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
   findOne(@Param('id') id: number): Promise<PipelineRequest> {
     this.logger.debug(`User retrieving pipeline request with id: ${id}`, {
       label: 'PipelineRequestsController : findOne',
@@ -68,6 +70,7 @@ export class PipelineRequestsController {
     description: 'The created PipelineRequest record',
     type: PipelineRequest,
   })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
   createRequest(
     @Body() createRequestDto: CreatePipelineRequestDto,
   ): Promise<PipelineRequest> {

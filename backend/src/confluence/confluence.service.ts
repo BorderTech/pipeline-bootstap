@@ -36,7 +36,7 @@ export class ConfluenceService {
         .toPromise();
 
       this.logger.debug(
-        `Creating Confluence Space for project: ${
+        `Created Confluence Space for project: ${
           createPipelineDto.projectName
         }.`,
         {

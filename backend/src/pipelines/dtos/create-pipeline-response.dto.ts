@@ -27,6 +27,8 @@ export class Bitbucket {
 
 export class Jenkins {
   @ApiModelProperty()
+  key: string;
+  @ApiModelProperty()
   name: string;
   @ApiModelProperty()
   url: string;

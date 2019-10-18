@@ -8,10 +8,14 @@ import { Repository } from 'typeorm';
 import { PipelineRequestStatus } from './pipeline-request-status.enum';
 import { PipelineRequestSoftwareMetadata } from './pipeline-request-software.entity';
 import { PipelineRequestBusinessMetadata } from './pipeline-request-business.entity';
+import { JiraService } from '../jira/jira.service';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class PipelineRequestsService {
   constructor(
+    private readonly jiraService: JiraService,
+    private readonly configService: ConfigService,
     @Inject('winston') private readonly logger: Logger,
     @InjectRepository(PipelineRequest)
     private readonly pipelineRepository: Repository<PipelineRequest>,
@@ -78,6 +82,22 @@ export class PipelineRequestsService {
         pipelineRequest.softwareMetadata = softwareMetadata;
       }
 
+      //Create Jira task associated with PipelineRequest
+      const jiraIssue = await this.jiraService.createIssue(
+        createRequestDto.requestor,
+        this.configService.jiraPipelineRequestSummaryText,
+        `Pipeline request for project: ${createRequestDto.projectName}`,
+        'Task',
+        this.configService.jiraIssueRepositoryKey,
+      );
+      // Add Jira Task URL to pipelineRequest db record
+      pipelineRequest.jiraIssueUrl = `${
+        this.configService.jiraWebBaseURL
+      }/browse/${jiraIssue.key}`;
+
+      // Save pipelineRequest to db
+      const result = await this.pipelineRepository.save(pipelineRequest);
+
       this.logger.debug(
         `Created pipeline request for project: ${createRequestDto.projectName}`,
         {
@@ -85,9 +105,7 @@ export class PipelineRequestsService {
           project: createRequestDto,
         },
       );
-
-      // Save pipelineRequest to DB
-      return await this.pipelineRepository.save(pipelineRequest);
+      return result;
     } catch (error) {
       console.log(error);
     }
@@ -119,5 +137,18 @@ export class PipelineRequestsService {
     });
     // Return found PipelineRequest
     return pipelineRequest;
+  }
+
+  async updatePipelineRequestAsDone(id: number): Promise<PipelineRequest> {
+    let pipelineRequestToUpdate = await this.pipelineRepository.findOne(id);
+    /* Update relevant jira issue */
+    const split = pipelineRequestToUpdate.jiraIssueUrl.split('/');
+    const jiraIssueKey = split[split.length - 1];
+    const transition = await this.jiraService.transitionIssueToDone(
+      jiraIssueKey,
+    );
+    /* Update database */
+    pipelineRequestToUpdate.status = 'Done';
+    return await this.pipelineRepository.save(pipelineRequestToUpdate);
   }
 }

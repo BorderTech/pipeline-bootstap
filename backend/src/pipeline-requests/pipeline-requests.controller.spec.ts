@@ -28,6 +28,7 @@ describe('PipelineRequestsController', () => {
     status: 'To Do',
     wbsCode: '123456',
     orgUnit: 'string',
+    jiraIssueUrl: 'www.example.com/jira-id',
   };
 
   const createPipelineRequest: CreatePipelineRequestDto = {
@@ -90,7 +91,7 @@ describe('PipelineRequestsController', () => {
     it('should return a PipelineRequest', async () => {
       const result = Promise.resolve(pipelineRequest);
       jest.spyOn(service, 'findOne').mockImplementation(() => result);
-      expect(await controller.findOne('string')).toStrictEqual(pipelineRequest);
+      expect(await controller.findOne(1)).toStrictEqual(pipelineRequest);
     });
   });
 

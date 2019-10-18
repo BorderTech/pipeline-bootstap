@@ -7,6 +7,9 @@ import { PipelineRequest } from './pipeline-request.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PipelineRequestStatus } from './pipeline-request-status.enum';
+import { ConfigService } from '../config/config.service';
+import * as path from 'path';
+import { CreateJiraIssueResponseDto } from '../jira/dto/create-jira-issue-response.dto';
 
 export type MockType<T> = { [P in keyof T]: jest.Mock<{}> };
 // @ts-ignore
@@ -23,6 +26,13 @@ describe('PipelineRequestsService', () => {
   let repositoryMock: MockType<Repository<PipelineRequest>>;
 
   beforeAll(async () => {
+    const JiraServiceProvider = {
+      provide: JiraService,
+      useClass: JiraServiceMock,
+    };
+
+    const envFilePath = path.join(__dirname, `../../.env.example`);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PipelineRequestsService,
@@ -30,6 +40,11 @@ describe('PipelineRequestsService', () => {
           provide: 'winston',
           useFactory: () => require('winston'),
         },
+        {
+          provide: ConfigService,
+          useValue: new ConfigService(envFilePath),
+        },
+        JiraServiceProvider,
         {
           provide: getRepositoryToken(PipelineRequest),
           useFactory: repositoryMockFactory,
@@ -64,6 +79,7 @@ describe('PipelineRequestsService', () => {
           wbsCode: '11111',
           status: 'To Do',
           created: new Date(),
+          jiraIssueUrl: 'www.example.com/jira-id',
         },
       ];
 
@@ -97,6 +113,7 @@ describe('PipelineRequestsService', () => {
         wbsCode: '11111',
         status: 'To Do',
         created: new Date(),
+        jiraIssueUrl: 'www.example.com/jira-id',
       };
 
       repositoryMock.findOne.mockReturnValue(pipelineRequest);
@@ -156,3 +173,19 @@ describe('PipelineRequestsService', () => {
     });
   });
 });
+
+class JiraServiceMock {
+  async createIssue(
+    reporter: string,
+    summary: string,
+    description: string,
+    issueType: string,
+    jiraProjectKey: string,
+  ): Promise<CreateJiraIssueResponseDto> {
+    return {
+      id: 'PIPEREQ-1',
+      key: 'PIPEREQ-1',
+      self: 'www.example.com/jira-issue',
+    };
+  }
+}

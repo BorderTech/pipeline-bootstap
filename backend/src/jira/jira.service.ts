@@ -75,6 +75,7 @@ export class JiraService {
   }
 
   async createIssue(
+    reporter: string,
     summary: string,
     description: string,
     issueType: string,
@@ -82,6 +83,7 @@ export class JiraService {
   ): Promise<CreateJiraIssueResponseDto> {
     try {
       const createJiraIssueRequestDto: CreateJiraIssueRequestDto = this.makeCreateJiraIssueRequestDto(
+        reporter,
         summary,
         description,
         issueType,
@@ -229,7 +231,6 @@ export class JiraService {
           label: 'JiraService : transitionIssueToDone',
         });
 
-        console.log(transition);
         return transition;
       } else {
         this.logger.warn(
@@ -328,15 +329,28 @@ export class JiraService {
   private makeCreateJiraProjectRequestDto(
     createRequestDto: CreatePipelineRequestDto,
   ): CreateJiraProjectRequestDto {
+    const { softwareMetadata, businessMetadata } = createRequestDto;
+    // Default to false to avoid undefined & override with user requested values
+    let kanbanBoardRequired = false,
+      projectManagementRequired = false;
+    if (softwareMetadata) {
+      kanbanBoardRequired = softwareMetadata.kanbanBoardRequired;
+    }
+    if (businessMetadata) {
+      projectManagementRequired = businessMetadata.projectManagementRequired;
+    }
+    // Generate jira project template key
+    let projectTemplateKey = this.generateProjectTemplateKey(
+      createRequestDto.projectType,
+      kanbanBoardRequired,
+      projectManagementRequired,
+    );
+    // Build the request object
     const createJiraProjectRequestDto: CreateJiraProjectRequestDto = {
       key: this.generateProjectKey(createRequestDto.projectName),
       name: createRequestDto.projectName,
       projectTypeKey: createRequestDto.projectType,
-      projectTemplateKey: this.generateProjectTemplateKey(
-        createRequestDto.projectType,
-        createRequestDto.softwareMetadata.kanbanBoardRequired,
-        createRequestDto.businessMetadata.projectManagementRequired,
-      ),
+      projectTemplateKey: projectTemplateKey,
       description: createRequestDto.projectDescription,
       lead: createRequestDto.projectLead,
       assigneeType: 'PROJECT_LEAD',
@@ -391,6 +405,7 @@ export class JiraService {
   }
 
   private makeCreateJiraIssueRequestDto(
+    reporter: string,
     summary: string,
     description: string,
     issueType: string,
@@ -405,6 +420,9 @@ export class JiraService {
         description: description,
         issuetype: {
           name: issueType,
+        },
+        reporter: {
+          name: reporter,
         },
       },
     };

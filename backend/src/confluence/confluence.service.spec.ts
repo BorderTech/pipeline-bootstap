@@ -73,10 +73,7 @@ describe('ConfluenceService', () => {
   let httpService: HttpService;
 
   beforeEach(async () => {
-    const envFilePath = path.join(
-      __dirname,
-      `../../${process.env.NODE_ENV || 'test'}.env`,
-    );
+    const envFilePath = path.join(__dirname, `../../.env.example`);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

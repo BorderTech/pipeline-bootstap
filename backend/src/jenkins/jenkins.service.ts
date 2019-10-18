@@ -29,6 +29,7 @@ export class JenkinsService {
         )
         .pipe(map(response => response.data))
         .toPromise();
+
       // Update Git URL & return jobConfig as JSON
       const updatedJobConfig = await this.updateJobGitUrl(
         newJobName,

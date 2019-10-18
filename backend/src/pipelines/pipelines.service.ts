@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Inject,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreatePipelineDto } from './dtos/create-pipeline.dto';
 import { JiraService } from '../jira/jira.service';
 import { ConfluenceService } from '../confluence/confluence.service';
@@ -11,6 +16,12 @@ import { CreatePipelineResponseDto } from './dtos/create-pipeline-response.dto';
 import { JenkinsService } from '../jenkins/jenkins.service';
 import { Logger } from 'winston';
 import { CreateJenkinsResponseDto } from '../jenkins/dto/create-jenkins-job-response.dto';
+import { Repository } from 'typeorm/repository/Repository';
+import { Pipeline } from './pipeline.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PipelineArtefact } from './pipeline-artefact.entity';
+import { PipelineRequest } from '../pipeline-requests/pipeline-request.entity';
+import { PipelineRequestsService } from '../pipeline-requests/pipeline-requests.service';
 
 @Injectable()
 export class PipelinesService {
@@ -21,11 +32,25 @@ export class PipelinesService {
     private jenkinsService: JenkinsService,
     private configService: ConfigService,
     @Inject('winston') private readonly logger: Logger,
+    private pipelineRequestsService: PipelineRequestsService,
+    @InjectRepository(Pipeline)
+    private readonly pipelineRepository: Repository<Pipeline>,
   ) {}
+
+  findAll(): Promise<Pipeline[]> {
+    return this.pipelineRepository.find({ relations: ['artefacts'] });
+  }
+
+  findOne(id: number): Promise<Pipeline> {
+    return this.pipelineRepository.findOne({
+      where: { id: id },
+      relations: ['artefacts'],
+    });
+  }
 
   async createPipeline(
     createPipelineDto: CreatePipelineDto,
-  ): Promise<CreatePipelineResponseDto> {
+  ): Promise<Pipeline> {
     let getJiraProjectResponseDto: GetJiraProjectResponseDto;
     let getConfluenceSpaceResponseDto: CreateConfluenceSpaceResponseDto;
     let getBitbucketRepositoryResponseDto: CreateBitbucketRepositoryResponseDto;
@@ -40,6 +65,11 @@ export class PipelinesService {
     );
 
     try {
+      /* Location Pipeline Request for createPipelineDto*/
+      let pipelineRequest = await this.pipelineRequestsService.findOne(
+        createPipelineDto.requestId,
+      );
+
       /* Create Jira project */
       getJiraProjectResponseDto = await this.jiraService.createProject(
         createPipelineDto,
@@ -61,6 +91,19 @@ export class PipelinesService {
           this.getSshGitUrl(getBitbucketRepositoryResponseDto),
         );
       }
+      /* Save created pipeline to the database */
+      const pipeline = this.makePipelineToSaveDb(
+        getJiraProjectResponseDto,
+        getConfluenceSpaceResponseDto,
+        getBitbucketRepositoryResponseDto,
+        getJenkinsJobResponseDto,
+      );
+      const result = await this.pipelineRepository.save(pipeline);
+
+      /* Update Pipeline Request as Done */
+      pipelineRequest = await this.pipelineRequestsService.updatePipelineRequestAsDone(
+        pipelineRequest.id,
+      );
 
       this.logger.debug(
         `Created pipeline for project: ${createPipelineDto.projectName}`,
@@ -70,16 +113,7 @@ export class PipelinesService {
         },
       );
 
-      /* Update PipelineRequest with URLs Jira Issue & Transition to Done */
-      // this.jiraService.transitionIssueToDone(createPipelineDto.id);
-
-      /* Return pipelineResponseDto */
-      return this.makePipelineResponseDto(
-        getJiraProjectResponseDto,
-        getConfluenceSpaceResponseDto,
-        getBitbucketRepositoryResponseDto,
-        getJenkinsJobResponseDto,
-      );
+      return result;
     } catch (error) {
       /* Delete anything that was partially created in the event of a failure */
       this.logger.warn(
@@ -120,6 +154,66 @@ export class PipelinesService {
     }
   }
 
+  private makePipelineToSaveDb(
+    getJiraProjectResponseDto,
+    getConfluenceSpaceResponseDto,
+    getBitbucketRepositoryResponseDto,
+    getJenkinsJobResponseDto,
+  ): Pipeline {
+    let pipeline = new Pipeline();
+    pipeline.name = getJiraProjectResponseDto.name;
+    let artefactArray: PipelineArtefact[] = [];
+
+    /* Jira */
+    if (getJiraProjectResponseDto) {
+      let jiraArtefact = new PipelineArtefact();
+      jiraArtefact.type = 'JIRA';
+      jiraArtefact.key = getJiraProjectResponseDto.key;
+      jiraArtefact.name = getJiraProjectResponseDto.name;
+      jiraArtefact.url = `${this.configService.jiraWebBaseURL}/projects/${
+        getJiraProjectResponseDto.key
+      }`;
+      artefactArray.push(jiraArtefact);
+    }
+    /* Confluence */
+    if (getConfluenceSpaceResponseDto) {
+      let confluenceArtefact = new PipelineArtefact();
+      confluenceArtefact.type = 'CONFLUENCE';
+      confluenceArtefact.key = getConfluenceSpaceResponseDto.key;
+      confluenceArtefact.name = getConfluenceSpaceResponseDto.name;
+      confluenceArtefact.url = `${
+        this.configService.confluenceWebBaseURL
+      }/display/${getConfluenceSpaceResponseDto.key}`;
+      artefactArray.push(confluenceArtefact);
+    }
+    /* Bitbucket */
+    if (getBitbucketRepositoryResponseDto) {
+      let bitbucketArtefact = new PipelineArtefact();
+      bitbucketArtefact.type = 'BITBUCKET';
+      bitbucketArtefact.key = getBitbucketRepositoryResponseDto.slug;
+      bitbucketArtefact.name = getBitbucketRepositoryResponseDto.name;
+      bitbucketArtefact.url = `${
+        this.configService.bitbucketWebBaseURL
+      }/projects/${this.configService.bitbucketProject}/repos/${
+        getBitbucketRepositoryResponseDto.slug
+      }`;
+      artefactArray.push(bitbucketArtefact);
+    }
+    /* Jenkins */
+    if (getJenkinsJobResponseDto) {
+      let jenkinsArtefact = new PipelineArtefact();
+      jenkinsArtefact.type = 'JENKINS';
+      jenkinsArtefact.key = getJenkinsJobResponseDto.name;
+      jenkinsArtefact.name = getJenkinsJobResponseDto.name;
+      jenkinsArtefact.url = getJenkinsJobResponseDto.url;
+
+      artefactArray.push(jenkinsArtefact);
+    }
+
+    pipeline.artefacts = artefactArray;
+    return pipeline;
+  }
+
   private makePipelineResponseDto(
     getJiraProjectResponseDto,
     getConfluenceSpaceResponseDto,
@@ -156,9 +250,10 @@ export class PipelinesService {
         }/repos/${getBitbucketRepositoryResponseDto.slug}`,
       };
     }
-    /* Bitbucket */
+    /* Jenkins */
     if (getJenkinsJobResponseDto) {
       createPipelineResponseDto.jenkins = {
+        key: getJenkinsJobResponseDto.name,
         ...getJenkinsJobResponseDto,
       };
     }

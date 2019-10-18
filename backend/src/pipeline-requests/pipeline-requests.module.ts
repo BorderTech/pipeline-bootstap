@@ -18,5 +18,6 @@ import { PipelineRequestBusinessMetadata } from './pipeline-request-business.ent
   ],
   controllers: [PipelineRequestsController],
   providers: [PipelineRequestsService],
+  exports: [PipelineRequestsService],
 })
 export class PipelineRequestsModule {}

@@ -5,12 +5,15 @@ import {
   ValidationPipe,
   UsePipes,
   Inject,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { CreatePipelineDto } from './dtos/create-pipeline.dto';
 import { PipelinesService } from './pipelines.service';
 import { Logger } from 'winston';
 import { CreatePipelineResponseDto } from './dtos/create-pipeline-response.dto';
 import { ApiResponse } from '@nestjs/swagger';
+import { Pipeline } from './pipeline.entity';
 
 @Controller('pipelines')
 export class PipelinesController {
@@ -18,6 +21,27 @@ export class PipelinesController {
     private pipelinesService: PipelinesService,
     @Inject('winston') private readonly logger: Logger,
   ) {}
+
+  @Get()
+  @UsePipes(ValidationPipe)
+  findAll(): Promise<Pipeline[]> {
+    return this.pipelinesService.findAll();
+  }
+
+  @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The found Pipeline record',
+    type: Pipeline,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  findOne(@Param('id') id: number): Promise<Pipeline> {
+    this.logger.debug(`User retrieving pipeline with id: ${id}`, {
+      label: 'PipelinesController : findOne',
+      id: id,
+    });
+    return this.pipelinesService.findOne(id);
+  }
 
   @Post()
   @UsePipes(ValidationPipe)
@@ -27,7 +51,7 @@ export class PipelinesController {
   })
   createPipeline(
     @Body() createPipelineDto: CreatePipelineDto,
-  ): Promise<CreatePipelineResponseDto> {
+  ): Promise<Pipeline> {
     this.logger.debug(
       `User creating pipeline for project: ${createPipelineDto.projectName}`,
       {

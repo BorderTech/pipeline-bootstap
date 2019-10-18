@@ -1,11 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsArray,
-  IsOptional,
-  IsString,
-  IsBoolean,
-} from 'class-validator';
+import { IsNotEmpty, IsArray, IsOptional, IsNumber } from 'class-validator';
 
 class SoftwareMetadata {
   @ApiModelProperty()
@@ -26,7 +20,12 @@ class BusinessMetadata {
 
 export class CreatePipelineDto {
   @ApiModelProperty()
-  @IsNotEmpty({ message: 'Project Type should not be empty.' }) // example of custom message
+  @IsNotEmpty()
+  @IsNumber()
+  requestId: number;
+
+  @ApiModelProperty()
+  @IsNotEmpty()
   projectType: string;
 
   @ApiModelProperty()
