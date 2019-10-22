@@ -32,6 +32,7 @@ export class PipelineRequests extends Component {
 			const response = await API.get(
 				`pipeline-requests?status=${filter}`
 			);
+			console.log(response);
 			this.setState({ data: response.data, loading: false });
 		} catch (err) {
 			console.log(err);

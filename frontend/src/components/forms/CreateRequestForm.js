@@ -13,18 +13,15 @@ import API from '../../api/api';
 
 export class CreateRequestForm extends Component {
 	submitForm = async (values, setSubmitting) => {
-		const formattedValues = this.formatSubmission(values);
-		console.log(formattedValues);
 		try {
 			const response = await API.post(
 				`pipeline-requests`,
-				formattedValues
+				this.formatSubmission(values)
 			);
 			// Complete Formik submit and send to the success page
 			setSubmitting(false);
 			this.props.history.push({
-				pathname: '/success',
-				state: { id: response.data.id }
+				pathname: `/pipeline-requests/${response.data.id}/success`
 			});
 		} catch (error) {
 			if (error.response) {
@@ -50,26 +47,36 @@ export class CreateRequestForm extends Component {
 		setSubmitting(false);
 	};
 	formatSubmission(values) {
-		//  Remove software project specific keys from
-		//  business & software projects prior to submission
-		let formattedValues = { ...values };
-		if (formattedValues.projectType === 'business') {
-			delete formattedValues.language;
-			delete formattedValues.kanbanBoardRequired;
-		}
-		if (formattedValues.projectType === 'software') {
-			delete formattedValues.projectManagementRequired;
-		}
+		// Format object match backend REST API formatting
+		let tempValues = { ...values };
+		let formattedValues = {};
 
-		//  Convert CSV formatted projectTechLead
-		//  to string array to pass API validation
-		if (formattedValues.projectTechLead) {
-			formattedValues.projectTechLead = formattedValues.projectTechLead
-				.trim()
-				.split(',');
+		if (tempValues.projectType === 'business') {
+			formattedValues.businessMetadata = {
+				projectManagementRequired: tempValues.projectManagementRequired
+			};
 		}
-		console.log(formattedValues);
-		return formattedValues;
+		if (tempValues.projectType === 'software') {
+			//  CSV formatted projectTechLead to string array
+			if (tempValues.projectTechLead) {
+				tempValues.projectTechLead = tempValues.projectTechLead
+					.trim()
+					.split(',');
+			}
+			// Build the softwareMetadata object for software projects
+			formattedValues.softwareMetadata = {
+				projectTechLead: tempValues.projectLead,
+				kanbanBoardRequired: tempValues.kanbanBoardRequired,
+				language: tempValues.language
+			};
+		}
+		// Remove the keys we don't want to merge
+		delete tempValues.projectManagementRequired;
+		delete tempValues.language;
+		delete tempValues.kanbanBoardRequired;
+		delete tempValues.projectTechLead;
+		// Merge objects into formattedValues for submission
+		return { ...formattedValues, ...tempValues };
 	}
 	render() {
 		return (
@@ -116,6 +123,19 @@ export class CreateRequestForm extends Component {
 									label='Business'
 								/>
 							</RadioButtonInputGroup>
+							{/* Requestor */}
+							<TextInput
+								id='requestor'
+								label='Requestor'
+								type='text'
+								placeholder='Enter requestor name'
+								value={values.requestor}
+								handleChange={handleChange}
+								handleBlur={handleBlur}
+								errors={errors.requestor}
+								touched={touched.requestor}
+								required
+							/>
 							{/* Project Name */}
 							<TextInput
 								id='projectName'

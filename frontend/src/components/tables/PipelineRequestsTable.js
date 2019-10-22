@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ReactTable from 'react-table';
 import { ReactTableDefaults } from 'react-table';
 import 'react-table/react-table.css';
-import { Button } from 'reactstrap';
+import { Button, Input } from 'reactstrap';
 
 export default function PipelineRequestsTable({
 	data,
@@ -18,23 +18,57 @@ export default function PipelineRequestsTable({
 				{
 					Header: 'Requestor',
 					accessor: 'requestor',
-					width: 150
+					width: 150,
+					Filter: ({ filter, onChange }) => (
+						<Input
+							onChange={event => onChange(event.target.value)}
+							value={filter ? filter.value : ''}
+							aria-label='Requestor'
+						/>
+					)
 				},
 				{
 					Header: 'Request Date',
 					accessor: 'created',
 					width: 150,
-					Cell: row => new Date(row.value).toLocaleDateString()
+					Cell: row => new Date(row.value).toLocaleDateString(),
+					filterable: false
 				},
 				{
 					Header: 'Project Name',
 					accessor: 'projectName',
-					width: 230
+					width: 230,
+					Filter: ({ filter, onChange }) => (
+						<input
+							onChange={event => onChange(event.target.value)}
+							value={filter ? filter.value : ''}
+							aria-label='Project Name'
+						/>
+					)
 				},
 				{
 					Header: 'Project Description',
 					accessor: 'projectDescription',
-					width: 470
+					width: 350,
+					Filter: ({ filter, onChange }) => (
+						<input
+							onChange={event => onChange(event.target.value)}
+							value={filter ? filter.value : ''}
+							aria-label='Project Description'
+						/>
+					)
+				},
+				{
+					Header: 'Project Type',
+					accessor: 'projectType',
+					// width: 120,
+					Filter: ({ filter, onChange }) => (
+						<input
+							onChange={event => onChange(event.target.value)}
+							value={filter ? filter.value : ''}
+							aria-label='Project Type'
+						/>
+					)
 				},
 				{
 					Header: 'Status',
@@ -43,6 +77,7 @@ export default function PipelineRequestsTable({
 					width: 100,
 					Filter: () => (
 						<select
+							aria-label='Status'
 							onChange={event =>
 								handleStatusFilterChange(event.target.value)
 							}

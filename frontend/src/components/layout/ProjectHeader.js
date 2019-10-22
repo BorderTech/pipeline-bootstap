@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 export default function ProjectHeader({
 	projectName,
 	status,
-	id,
+	url,
 	creatingPipeline,
 	approvePipelineRequest
 }) {
@@ -14,8 +14,8 @@ export default function ProjectHeader({
 		<Columns>
 			<h2>
 				{projectName} (
-				<a target='_blank' href={`/`} rel='noopener noreferrer'>
-					{id}
+				<a target='_blank' href={url} rel='noopener noreferrer'>
+					View Jira
 				</a>
 				)
 			</h2>
@@ -46,7 +46,9 @@ function Status(props) {
 					onClick={approvePipelineRequest}
 					disabled={creatingPipeline}
 				>
-					Approve Request
+					{!creatingPipeline
+						? 'Approve Request'
+						: 'Creating Pipeline...'}
 				</Button>
 			);
 		case 'Done':

@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import CreateRequestForm from '../forms/CreateRequestForm';
 
-export class Create extends Component {
+export class PipelineRequestCreate extends Component {
 	render() {
 		return (
 			<Fragment>
@@ -12,4 +12,4 @@ export class Create extends Component {
 	}
 }
 
-export default Create;
+export default PipelineRequestCreate;

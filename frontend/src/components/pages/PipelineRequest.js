@@ -22,45 +22,65 @@ export class PipelineRequest extends Component {
 			created: '',
 			projectType: '',
 			orgUnit: '',
-			wbsCode: ''
+			jiraIssueUrl: '',
+			wbsCode: '',
+			businessMetadata: {
+				projectManagementRequired: false
+			},
+			softwareMetadata: {
+				kanbanBoardRequired: false,
+				language: ''
+			}
 		},
-		error: ''
+		errorMessage: '',
+		errorObject: null
 	};
 	componentDidMount() {
 		const { id } = this.props.match.params;
 		this.getPipelineRequest(id);
 	}
 	render() {
-		const { loading, error, creatingPipeline } = this.state;
+		const {
+			loading,
+			errorMessage,
+			errorObject,
+			creatingPipeline,
+			pipelineRequest
+		} = this.state;
 		const {
 			id,
 			status,
 			requestor,
 			created,
 			projectType,
+			jiraIssueUrl,
 			projectName,
 			projectDescription,
 			projectLead,
 			projectTechLead,
 			orgUnit,
 			wbsCode,
-			kanbanBoardRequired,
-			projectManagementRequired,
-			language
-		} = this.state.pipelineRequest;
+			businessMetadata,
+			softwareMetadata
+		} = pipelineRequest;
 		return (
 			<Fragment>
 				{/* Page loading while waiting for backend response */}
 				{loading ? <Loader /> : null}
 
 				{/* Unsuccessful page load - i.e. request was not found */}
-				{!loading && error ? <ErrorAlert message={error} /> : null}
+				{!loading && errorMessage ? (
+					<ErrorAlert
+						message={errorMessage}
+						errorObject={errorObject}
+					/>
+				) : null}
 
 				{/* Successful page load - display tables */}
 				{id && !loading ? (
 					<Fragment>
 						<ProjectHeader
-							id={id}
+							url={jiraIssueUrl}
 							status={status}
 							projectName={projectName}
 							creatingPipeline={creatingPipeline}
@@ -79,15 +99,24 @@ export class PipelineRequest extends Component {
 						/>
 						<JiraInformationTable
 							projectType={projectType}
-							kanbanBoardRequired={kanbanBoardRequired}
+							// handle null values when different proj type
+							kanbanBoardRequired={
+								softwareMetadata
+									? softwareMetadata.kanbanBoardRequired
+									: false
+							}
 							projectManagementRequired={
-								projectManagementRequired
+								businessMetadata
+									? businessMetadata.projectManagementRequired
+									: false
 							}
 						/>
 						<ConfluenceInformationTable />
 						{/* Display optional table for software development projects */}
 						{projectType === 'software' && (
-							<BitbucketInformationTable language={language} />
+							<BitbucketInformationTable
+								language={softwareMetadata.language}
+							/>
 						)}
 					</Fragment>
 				) : null}
@@ -101,19 +130,17 @@ export class PipelineRequest extends Component {
 			console.log('Approve pipeline clicked');
 			this.setState({ creatingPipeline: true });
 			const response = await API.post(`pipelines`, createPipelineDto);
-			// Do something with the reponse...
-			// console.log(response);
+			console.log(response);
 		} catch (error) {
-			// Handle error here...
-			console.log(error);
 			this.setState({
-				error: error.response.data.message,
+				errorMessage: error.response.data.message,
+				errorObject: error.response ? error.response : error,
 				loading: false
 			});
 		}
 		setTimeout(() => {
 			this.setState({ creatingPipeline: false });
-		}, 1000);
+		}, 3000);
 	};
 
 	async getPipelineRequest(id) {
@@ -124,43 +151,36 @@ export class PipelineRequest extends Component {
 		} catch (error) {
 			const { message } = error.response.data.message;
 			this.setState({
-				error: message,
+				errorMessage: message,
+				errorObject: error.response ? error.response : error,
 				loading: false
 			});
 		}
 	}
+
 	makeCreatePipelineDto(pipelineRequest) {
-		let createPipelineDto;
-		// Properties shared by business & software projects
-		const {
+		let createPipelineDto = (({
 			projectType,
+			requestor,
 			projectName,
 			projectDescription,
-			projectLead,
-			projectTechLead,
 			orgUnit,
+			projectLead,
 			wbsCode,
-			projectManagementRequired,
-			kanbanBoardRequired
-		} = pipelineRequest;
-		createPipelineDto = {
+			businessMetadata,
+			softwareMetadata
+		}) => ({
 			projectType,
+			requestor,
 			projectName,
 			projectDescription,
-			projectLead,
-			projectTechLead,
 			orgUnit,
-			wbsCode
-		};
-		// Properties unique to each type
-		if (projectType === 'business') {
-			createPipelineDto = {
-				...createPipelineDto,
-				projectManagementRequired
-			};
-		} else if (projectType === 'software') {
-			createPipelineDto = { ...createPipelineDto, kanbanBoardRequired };
-		}
+			projectLead,
+			wbsCode,
+			businessMetadata,
+			softwareMetadata
+		}))(pipelineRequest);
+		createPipelineDto.requestId = pipelineRequest.id;
 		return createPipelineDto;
 	}
 }
