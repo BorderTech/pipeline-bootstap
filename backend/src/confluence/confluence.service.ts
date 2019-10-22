@@ -1,4 +1,4 @@
-import { Injectable, HttpService, Inject } from '@nestjs/common';
+import { Injectable, HttpService, Inject, HttpException } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { CreatePipelineRequestDto } from '../pipeline-requests/dtos/create-pipeline-request.dto';
 import { CreateConfluenceSpaceResponseDto } from './dto/create-space-request.dto';
@@ -47,7 +47,8 @@ export class ConfluenceService {
 
       return confluenceSpace;
     } catch (error) {
-      handleAxiosError(error);
+      // handleAxiosError(error);
+      this.handleConfluenceError(error);
     }
   }
 
@@ -62,6 +63,18 @@ export class ConfluenceService {
       return data;
     } catch (error) {
       handleAxiosError(error);
+    }
+  }
+
+  private handleConfluenceError(error) {
+    if (error.response) {
+      let errorMessage = '';
+      const { errors } = error.response.data.data;
+      //Extract error messages form the array of errors returned
+      errors.forEach(error => {
+        errorMessage += `${error.message.translation}\n`;
+      });
+      throw new HttpException(errorMessage, error.response.status);
     }
   }
 

@@ -16,9 +16,11 @@ export class Pipeline {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiModelProperty()
   @Column()
   name: string;
 
+  @ApiModelProperty()
   @OneToMany(
     type => PipelineArtefact,
     pipelineArtefact => pipelineArtefact.pipeline,

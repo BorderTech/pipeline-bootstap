@@ -3,6 +3,7 @@ import {
   HttpService,
   InternalServerErrorException,
   Inject,
+  HttpException,
 } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { JiraProjectTemplateKey } from './jira-project-template-key.enum';
@@ -181,7 +182,8 @@ export class JiraService {
         },
       );
     } catch (error) {
-      handleAxiosError(error);
+      // handleAxiosError(error);
+      this.handleJiraError(error);
     }
     // Return the created project
     // NOTE: Does not return administrators created
@@ -243,12 +245,24 @@ export class JiraService {
     }
   }
 
+  private handleJiraError(error) {
+    if (error.response) {
+      let errorMessage = '';
+      const { errors } = error.response.data;
+      Object.keys(errors).forEach(function(key) {
+        console.log(key, errors[key]);
+        errorMessage += `${errors[key]}`;
+      });
+      throw new HttpException(errorMessage, error.response.status);
+    }
+  }
+
   private async getIssueTransitions(
     issueIdOrKey: string,
   ): Promise<GetJiraIssueTransitionsDto> {
     this.logger.debug(
       `Retrieving issue transition options for issue id: ${issueIdOrKey}`,
-      { label: 'JiraService getIssueTransitions: getIssueTransitions' },
+      { label: 'JiraService : getIssueTransitions' },
     );
     try {
       const jiraIssueTransitions: GetJiraIssueTransitionsDto = await this.httpService
@@ -259,7 +273,7 @@ export class JiraService {
       this.logger.debug(
         `Retrieved issue transition options for issue id: ${issueIdOrKey}`,
         {
-          label: 'JiraService getIssueTransitions: getIssueTransitions',
+          label: 'JiraService : getIssueTransitions',
           issueTransitions: jiraIssueTransitions,
         },
       );

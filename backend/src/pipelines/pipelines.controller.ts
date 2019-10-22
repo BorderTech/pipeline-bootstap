@@ -47,7 +47,7 @@ export class PipelinesController {
   @UsePipes(ValidationPipe)
   @ApiResponse({
     status: 201,
-    type: CreatePipelineResponseDto,
+    type: Pipeline,
   })
   createPipeline(
     @Body() createPipelineDto: CreatePipelineDto,

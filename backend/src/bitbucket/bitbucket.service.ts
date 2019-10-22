@@ -1,4 +1,4 @@
-import { Injectable, HttpService, Inject } from '@nestjs/common';
+import { Injectable, HttpService, Inject, HttpException } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { CreatePipelineDto } from './../pipelines/dtos/create-pipeline.dto';
 import { CreateBitbucketRepositoryRequestDto } from './dto/create-bitbucket-repository-request.dto';
@@ -51,7 +51,20 @@ export class BitbucketService {
       );
       return createBitbucketRepositoryResponseDto;
     } catch (error) {
-      handleAxiosError(error);
+      // handleAxiosError(error);
+      this.handleBitbucketError(error);
+    }
+  }
+
+  private handleBitbucketError(error) {
+    if (error.response) {
+      let errorMessage = '';
+      const { errors } = error.response.data;
+      Object.keys(errors).forEach(function(key) {
+        console.log(key, errors[key].message);
+        errorMessage += `${errors[key].message}`;
+      });
+      throw new HttpException(errorMessage, error.response.status);
     }
   }
 
