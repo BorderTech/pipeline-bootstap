@@ -111,7 +111,7 @@ export class PipelineRequest extends Component {
 									: false
 							}
 						/>
-						<ConfluenceInformationTable />
+						<ConfluenceInformationTable spaceType='Basic' />
 						{/* Display optional table for software development projects */}
 						{projectType === 'software' && (
 							<BitbucketInformationTable

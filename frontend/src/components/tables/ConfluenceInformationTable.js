@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'reactstrap';
 
-export default function ConfluenceInformationTable() {
+export default function ConfluenceInformationTable({ spaceType }) {
 	return (
 		<Table>
 			<thead>
@@ -10,9 +10,9 @@ export default function ConfluenceInformationTable() {
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
+				<tr id='spaceType'>
 					<td style={{ width: '50%' }}>Space Type</td>
-					<td>Basic</td>
+					<td>{spaceType}</td>
 				</tr>
 			</tbody>
 		</Table>

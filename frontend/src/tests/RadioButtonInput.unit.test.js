@@ -15,7 +15,12 @@ describe('RadioButtonInput', () => {
 });
 
 describe('RadioButtonInput props', () => {
-	let props;
+	const onChangeMock = jest.fn();
+	let props = {
+		field: {
+			onChange: onChangeMock
+		}
+	};
 	const wrapper = mount(<RadioButtonInput {...props} />);
 	it('should receive and set the radio button id', () => {
 		wrapper.setProps({ field: { id: 'radioButtonIdOne' } });
@@ -23,12 +28,16 @@ describe('RadioButtonInput props', () => {
 		wrapper.unmount();
 	});
 	it('should receive and set the radio button label', () => {
-		wrapper.setProps({ label: 'radioButtonLabel' });
+		wrapper.setProps({
+			field: {
+				onChange: onChangeMock
+			},
+			label: 'radioButtonLabel'
+		});
 		expect(wrapper.props().label).toEqual('radioButtonLabel');
 		wrapper.unmount();
 	});
 	it('should call onChange prop', () => {
-		const onChangeMock = jest.fn();
 		const event = {
 			target: { value: true }
 		};
@@ -39,13 +48,15 @@ describe('RadioButtonInput props', () => {
 	});
 	it('should call onBlur prop', () => {
 		const onBlurMock = jest.fn();
+		const onChangeMock = jest.fn();
 		const event = {
 			target: { value: true }
 		};
-		wrapper.setProps({ field: { onBlur: onBlurMock } });
+		wrapper.setProps({
+			field: { onBlur: onBlurMock, onChange: onChangeMock }
+		});
 		wrapper.find('input').simulate('blur', event);
 		expect(onBlurMock).toHaveBeenCalled();
 		wrapper.unmount();
 	});
-	wrapper.unmount();
 });

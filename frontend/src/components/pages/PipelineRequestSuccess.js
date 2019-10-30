@@ -91,7 +91,7 @@ export class PipelineRequestSuccess extends Component {
 								{jiraIssueUrl}
 							</a>
 						</h5>
-						<Link to='/create'>
+						<Link to='/pipeline-requests/create'>
 							<Button color='primary'>Create New Request</Button>
 						</Link>
 					</Fragment>

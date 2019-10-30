@@ -18,7 +18,7 @@ export default function JiraInformationTable({
 					{/* Software projects */}
 					{projectType === 'software' && (
 						<Fragment>
-							<tr>
+							<tr id='projectType'>
 								<td style={{ width: '50%' }}>Project Type</td>
 								<td>
 									{kanbanBoardRequired ? 'Kanban' : 'Scrum'}
@@ -29,7 +29,7 @@ export default function JiraInformationTable({
 					{/* Business projects */}
 					{projectType === 'business' && (
 						<Fragment>
-							<tr>
+							<tr id='projectType'>
 								<td style={{ width: '50%' }}>Project Type</td>
 								<td>
 									{projectManagementRequired

@@ -16,7 +16,12 @@ describe('CheckboxInput', () => {
 });
 
 describe('CheckboxInput props', () => {
-	let props;
+	const onChangeMock = jest.fn();
+	let props = {
+		field: {
+			onChange: onChangeMock
+		}
+	};
 	const wrapper = mount(<CheckboxInput {...props} />);
 	it('should receive and set the checkbox id', () => {
 		wrapper.setProps({ field: { id: 'checkbodIdOne' } });

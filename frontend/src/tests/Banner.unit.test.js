@@ -1,4 +1,3 @@
-//Example of unit test for a react component - the Banner
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import Banner from '../components/layout/Banner';

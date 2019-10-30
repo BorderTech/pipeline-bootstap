@@ -20,7 +20,10 @@ describe('LanguageSelectInput', () => {
 });
 
 describe('LanguageSelectInput props', () => {
-	let props;
+	const onChangeMock = jest.fn();
+	let props = {
+		handleChange: onChangeMock
+	};
 	const wrapper = mount(<LanguageSelectInput {...props} />);
 	it('should receive and set the select value', () => {
 		wrapper.setProps({ value: 'value' });
@@ -47,5 +50,4 @@ describe('LanguageSelectInput props', () => {
 		expect(onBlurMock).toHaveBeenCalled();
 		wrapper.unmount();
 	});
-	wrapper.unmount();
 });

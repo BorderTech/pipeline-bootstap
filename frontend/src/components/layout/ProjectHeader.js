@@ -21,7 +21,7 @@ export default function ProjectHeader({
 			</h2>
 			<div style={{ float: 'right' }}>
 				<Link to={`/pipeline-requests`}>
-					<Button outline color='primary'>
+					<Button id='viewAllRequests' outline color='primary'>
 						View all requests
 					</Button>
 				</Link>
@@ -35,13 +35,14 @@ export default function ProjectHeader({
 	);
 }
 
-function Status(props) {
+const Status = props => {
 	const { value, creatingPipeline, approvePipelineRequest } = props;
 	/* eslint-disable indent */
 	switch (value) {
 		case 'To Do':
 			return (
 				<Button
+					id='approveRequest'
 					color='primary'
 					onClick={approvePipelineRequest}
 					disabled={creatingPipeline}
@@ -52,8 +53,12 @@ function Status(props) {
 				</Button>
 			);
 		case 'Done':
-			return <Button color='success'>Complete</Button>;
+			return (
+				<Button disabled color='success'>
+					Complete
+				</Button>
+			);
 		default:
 			return <Button color='secondary'>{value}</Button>;
 	}
-}
+};

@@ -10,7 +10,7 @@ export default function BitbucketInformationTable({ language }) {
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
+				<tr id='language'>
 					<td style={{ width: '50%' }}>Language</td>
 					<td>{language}</td>
 				</tr>

@@ -20,41 +20,41 @@ export default function ProjectInformationTable({
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
+				<tr id='requestor'>
 					<td style={{ width: '50%' }}>Requestor</td>
 					<td>{requestor}</td>
 				</tr>
-				<tr>
+				<tr id='date'>
 					<td>Date</td>
-					<td>{new Date(created).toLocaleDateString()}</td>
+					<td>{created && new Date(created).toLocaleDateString()}</td>
 				</tr>
-				<tr>
+				<tr id='name'>
 					<td>Name</td>
 					<td>{projectName}</td>
 				</tr>
-				<tr>
+				<tr id='description'>
 					<td>Description</td>
 					<td>{projectDescription}</td>
 				</tr>
-				<tr>
+				<tr id='projectType'>
 					<td>Project Type</td>
 					<td>{projectType}</td>
 				</tr>
-				<tr>
+				<tr id='projectLead'>
 					<td>Lead</td>
 					<td>{projectLead}</td>
 				</tr>
-				<tr>
+				<tr id='techLead'>
 					<td>Tech Lead(s)</td>
 					<td>
 						{projectTechLead ? projectTechLead.toString() : '-'}
 					</td>
 				</tr>
-				<tr>
+				<tr id='orgUnit'>
 					<td>Organisational Unit</td>
 					<td>{orgUnit}</td>
 				</tr>
-				<tr>
+				<tr id='wbsCode'>
 					<td>WBS Code</td>
 					<td>{wbsCode}</td>
 				</tr>

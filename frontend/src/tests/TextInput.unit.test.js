@@ -16,7 +16,10 @@ describe('TextInput', () => {
 });
 
 describe('TextInput props', () => {
-	let props;
+	const onChangeMock = jest.fn();
+	let props = {
+		handleChange: onChangeMock
+	};
 	const wrapper = mount(<TextInput {...props} />);
 	it('should receive and set the input id', () => {
 		wrapper.setProps({ id: 'projectName' });
@@ -78,5 +81,4 @@ describe('TextInput props', () => {
 		expect(onBlurMock).toHaveBeenCalled();
 		wrapper.unmount();
 	});
-	wrapper.unmount();
 });
