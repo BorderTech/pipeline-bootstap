@@ -1,0 +1,6 @@
+{
+	"extends": "react-app",
+	"rules": {
+		"indent": ["warn", "tab", "plugin:jsx-a11y/recommended"]
+	}
+}
