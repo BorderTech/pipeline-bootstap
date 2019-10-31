@@ -114,7 +114,9 @@ export class JiraService {
 
       return data;
     } catch (error) {
-      handleAxiosError(error);
+      // handle formulated in service classes - throw up
+      // to top level handler - returned to user
+      throw error;
     }
   }
 

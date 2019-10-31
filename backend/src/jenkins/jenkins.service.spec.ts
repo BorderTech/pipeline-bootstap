@@ -8,6 +8,7 @@ import { AxiosResponse } from 'axios';
 import { of } from 'rxjs';
 
 const createPipelineDto: CreatePipelineDto = {
+  requestId: 1,
   requestor: 'Joe Citizen',
   projectType: 'software',
   projectName: 'My repo',

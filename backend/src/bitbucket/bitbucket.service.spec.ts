@@ -59,6 +59,7 @@ const repository: CreateBitbucketRepositoryResponseDto = {
 };
 
 const createPipelineDto: CreatePipelineDto = {
+  requestId: 1,
   requestor: 'Joe Citizen',
   projectType: 'software',
   projectName: 'My repo',
