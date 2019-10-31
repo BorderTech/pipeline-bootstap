@@ -5,3 +5,10 @@ matrix:
       before_script:
         - cd backend
         - npm install
+
+  include:
+    - language: node_js
+      node_js: 10
+      before_script:
+        - cd frontend
+        - npm install
