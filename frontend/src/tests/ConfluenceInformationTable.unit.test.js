@@ -5,7 +5,6 @@ import { Table } from 'reactstrap';
 
 describe('ConfluenceInformationTable', () => {
 	const wrapper = shallow(<ConfluenceInformationTable />);
-	console.log(wrapper.debug());
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);
 	});

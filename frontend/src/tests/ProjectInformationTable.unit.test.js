@@ -5,7 +5,6 @@ import { Table } from 'reactstrap';
 
 describe('ProjectInformationTable', () => {
 	const wrapper = shallow(<ProjectInformationTable />);
-	console.log(wrapper.debug());
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);
 	});
