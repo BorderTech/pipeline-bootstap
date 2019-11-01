@@ -2,15 +2,16 @@ import React from 'react';
 import '../../styles/css/banner.css';
 import DepartmentLogo from '../../logo-white.svg';
 import PropTypes from 'prop-types';
+import { Container } from 'reactstrap';
 
 export default function Banner({ name, logo, alttext }) {
 	return (
-		<div className='App'>
-			<header className='App-header'>
+		<header className='App-header'>
+			<Container>
 				<img src={logo} className='App-logo' alt={alttext} />
 				<h1 className='App-title'>{name}</h1>
-			</header>
-		</div>
+			</Container>
+		</header>
 	);
 }
 

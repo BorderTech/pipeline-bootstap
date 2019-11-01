@@ -5,7 +5,6 @@ import { Table } from 'reactstrap';
 
 describe('BitbucketInformationTable', () => {
 	const wrapper = shallow(<BitbucketInformationTable />);
-	console.log(wrapper.debug());
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);
 	});

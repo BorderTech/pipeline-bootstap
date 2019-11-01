@@ -3,8 +3,8 @@ import { shallow, mount } from 'enzyme';
 import Banner from '../components/layout/Banner';
 
 describe('Banner', () => {
-	it('should render a div', () => {
-		expect(shallow(<Banner />).find('div.App').length).toBe(1);
+	it('should render a header', () => {
+		expect(shallow(<Banner />).find('header').length).toBe(1);
 	});
 
 	it('should render a header element', () => {

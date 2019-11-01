@@ -127,10 +127,12 @@ export class PipelineRequest extends Component {
 		const { pipelineRequest } = this.state;
 		const createPipelineDto = this.makeCreatePipelineDto(pipelineRequest);
 		try {
-			console.log('Approve pipeline clicked');
 			this.setState({ creatingPipeline: true });
 			const response = await API.post(`pipelines`, createPipelineDto);
 			console.log(response);
+			this.props.history.push({
+				pathname: `/pipelines/${response.data.id}/success`
+			});
 		} catch (error) {
 			this.setState({
 				errorMessage: error.response.data.message,

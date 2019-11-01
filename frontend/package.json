@@ -43,6 +43,7 @@
 		"start": "react-scripts start",
 		"sass-build": "node ./node_modules/sass/sass --update src/styles:src/styles/css",
 		"build": "npm run sass-build && react-scripts build",
+		"test": "node ./node_modules/jest/bin/jest --verbose",
 		"unit-test": "node ./node_modules/jest/bin/jest --verbose",
 		"ui-test": "node ./node_modules/jest/bin/jest --testMatch=**/?(*.)ui.test.js?(x)",
 		"lighthouse": "node ./node_modules/lighthouse/lighthouse-cli/index.js --quiet --chrome-flags='--headless' http://localhost:3000",

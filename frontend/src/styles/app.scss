@@ -59,3 +59,40 @@ form button {
   top: 45%;
   left: 45%;
 }
+
+/* Sticky Footer */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main {
+  flex: 1 0 auto;
+}
+
+footer {
+  background-image: radial-gradient(#024da1, #072243);
+  color: white;
+  flex-shrink: 0; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  padding: 20px;
+  margin-top: 10px;
+}
+
+/* BannerWithNav */
+
+.header {
+  background-image: radial-gradient(#024da1, #072243);
+  color: white;
+}
+
+.navbar-brand h1 {
+  color: white;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: white;
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+  color: lightgray;
+}

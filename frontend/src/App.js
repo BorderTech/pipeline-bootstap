@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import image from './logo-white.svg';
-import Banner from './components/layout/Banner';
+import BannerWithNav from './components/layout/BannerWithNav';
 import { Container } from 'reactstrap';
 import Home from './components/pages/Home';
 import PipelineRequestCreate from './components/pages/PipelineRequestCreate';
@@ -12,17 +12,19 @@ import PipelineCreateSuccess from './components/pages/PipelineCreateSuccess';
 import PipelineRequests from './components/pages/PipelineRequests';
 import PipelineRequest from './components/pages/PipelineRequest';
 import Login from './components/pages/Login';
+import PageNotFound from './components/layout/PageNotFound';
+import Footer from './components/layout/Footer';
 
 export default class App extends React.Component {
 	render() {
 		return (
-			<main className='react-app'>
-				<Router>
-					<Banner
-						logo={image}
-						name='Pipeline Bootstrap'
-						alttext='Department of Home Affairs logo'
-					/>
+			<Router>
+				<BannerWithNav
+					logo={image}
+					name='Pipeline Bootstrap'
+					alttext='Department of Home Affairs logo'
+				/>
+				<main className='react-app'>
 					<Container>
 						<Switch>
 							<Route exact path='/' component={Home} />
@@ -55,10 +57,13 @@ export default class App extends React.Component {
 								path='/pipelines/:id/success'
 								component={PipelineCreateSuccess}
 							/>
+							{/* 404 Page not found */}
+							<Route component={PageNotFound} />
 						</Switch>
 					</Container>
-				</Router>
-			</main>
+				</main>
+				<Footer logo={image} />
+			</Router>
 		);
 	}
 }
