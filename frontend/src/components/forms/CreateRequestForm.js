@@ -25,7 +25,6 @@ export class CreateRequestForm extends Component {
 				`pipeline-requests`,
 				this.formatSubmission(values)
 			);
-			console.log(response);
 			// Complete Formik submit and send to the success page
 			setSubmitting(false);
 			this.props.history.push({
