@@ -2,8 +2,22 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import TextInput from '../components/inputs/TextInput';
 import { Input, Label, FormGroup } from 'reactstrap';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('TextInput', () => {
+	expect.extend(toHaveNoViolations);
+
+	let props = {
+		id: 'TextInput',
+		label: 'TextInput'
+	};
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(<TextInput {...props} />);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render FormGroup div', () => {
 		expect(shallow(<TextInput />).find(FormGroup).length).toBe(1);
 	});

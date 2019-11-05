@@ -1,11 +1,22 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import SoftwareProjectFormInputs from '../components/forms/SoftwareProjectFormInputs';
-import LanguageSelectInput from '../components/inputs/LanguageSelectInput';
-import { Card, CardBody, Input } from 'reactstrap';
+import { Card, CardBody } from 'reactstrap';
 import { Field, Formik } from 'formik';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('SoftwareProjectFormInputs', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(
+			<SoftwareProjectFormInputs />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render Card element', () => {
 		expect(shallow(<SoftwareProjectFormInputs />).find(Card).length).toBe(
 			1

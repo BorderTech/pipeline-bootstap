@@ -2,8 +2,20 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import BitbucketInformationTable from '../components/tables/BitbucketInformationTable';
 import { Table } from 'reactstrap';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('BitbucketInformationTable', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(
+			<BitbucketInformationTable />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	const wrapper = shallow(<BitbucketInformationTable />);
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);

@@ -2,9 +2,22 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import ConfluenceInformationTable from '../components/tables/ConfluenceInformationTable';
 import { Table } from 'reactstrap';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('ConfluenceInformationTable', () => {
 	const wrapper = shallow(<ConfluenceInformationTable />);
+
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(
+			<ConfluenceInformationTable />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);
 	});

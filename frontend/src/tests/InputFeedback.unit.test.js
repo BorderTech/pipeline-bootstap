@@ -1,11 +1,26 @@
-//Example of unit test for a react component - the Banner
 import React from 'react';
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import { InputFeedback } from '../components/inputs/InputFeedback';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('InputFeedback props', () => {
 	let props;
 	const wrapper = mount(<InputFeedback {...props} />);
+
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		let props = {
+			error: 'test error'
+		};
+		const html = ReactDOMServer.renderToString(
+			<InputFeedback {...props} />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render nothing if error prop not provided', () => {
 		expect(wrapper.find('div.field-error').length).toBe(0);
 	});

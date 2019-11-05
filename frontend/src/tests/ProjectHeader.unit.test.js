@@ -2,6 +2,8 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import ProjectHeader from '../components/layout/ProjectHeader';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('ProjectHeader', () => {
 	const projectName = 'Test Project Name';
@@ -18,6 +20,25 @@ describe('ProjectHeader', () => {
 			/>
 		</Router>
 	);
+
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(
+			<Router>
+				<ProjectHeader
+					projectName={projectName}
+					url={url}
+					status='To Do'
+					approvePipelineRequest={mockApprovePipelineRequest}
+					creatingPipeline={false}
+				/>
+			</Router>
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render h2 header element', () => {
 		expect(wrapper.find('h2').length).toBe(1);
 	});

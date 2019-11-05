@@ -1,8 +1,27 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import RadioButtonInput from '../components/inputs/RadioButtonInput';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('RadioButtonInput', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		let props = {
+			field: {
+				name: 'radioButton'
+			},
+			id: 'radioButton',
+			label: 'radioButton'
+		};
+		const html = ReactDOMServer.renderToString(
+			<RadioButtonInput {...props} />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render radio div', () => {
 		expect(shallow(<RadioButtonInput />).find('div.radio').length).toBe(1);
 	});

@@ -1,10 +1,19 @@
 import React from 'react';
-import { Field } from 'formik';
 import { shallow, mount } from 'enzyme';
 import { FormGroup, Label, Input } from 'reactstrap';
 import LanguageSelectInput from '../components/inputs/LanguageSelectInput';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('LanguageSelectInput', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(<LanguageSelectInput />);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render FormGroup div', () => {
 		expect(shallow(<LanguageSelectInput />).find(FormGroup).length).toBe(1);
 	});

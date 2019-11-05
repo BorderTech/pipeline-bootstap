@@ -1,11 +1,27 @@
 import React from 'react';
 import { Field } from 'formik';
 import { shallow, mount } from 'enzyme';
-import { FormGroup, Label } from 'reactstrap';
+import { FormGroup } from 'reactstrap';
 import RadioButtonInputGroup from '../components/inputs/RadioButtonInputGroup';
 import RadioButtonInput from '../components/inputs/RadioButtonInput';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('RadioButtonInput', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		let props = {
+			id: 'RadioButtonGroup',
+			label: 'RadioButtonGroup'
+		};
+		const html = ReactDOMServer.renderToString(
+			<RadioButtonInputGroup {...props} />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render FormGroup div', () => {
 		expect(shallow(<RadioButtonInputGroup />).find(FormGroup).length).toBe(
 			1

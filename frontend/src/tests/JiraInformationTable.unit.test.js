@@ -2,8 +2,18 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import JiraInformationTable from '../components/tables/JiraInformationTable';
 import { Table } from 'reactstrap';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('JiraInformationTable', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(<JiraInformationTable />);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	const wrapper = shallow(<JiraInformationTable projectType='' />);
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);

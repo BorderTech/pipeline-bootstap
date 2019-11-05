@@ -1,8 +1,12 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import Banner from '../components/layout/Banner';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('Banner', () => {
+	expect.extend(toHaveNoViolations);
+
 	it('should render a header', () => {
 		expect(shallow(<Banner />).find('header').length).toBe(1);
 	});
@@ -17,6 +21,12 @@ describe('Banner', () => {
 
 	it('should have title of level h1', () => {
 		expect(shallow(<Banner />).find('h1.App-title').length).toBe(1);
+	});
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(<Banner />);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
 	});
 });
 

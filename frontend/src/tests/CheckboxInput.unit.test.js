@@ -2,6 +2,8 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { CheckboxInput } from '../components/inputs/CheckboxInput';
 import { Input, Label, FormGroup } from 'reactstrap';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('CheckboxInput', () => {
 	it('should render FormGroup div', () => {
@@ -23,6 +25,21 @@ describe('CheckboxInput props', () => {
 		}
 	};
 	const wrapper = mount(<CheckboxInput {...props} />);
+
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		let props = {
+			field: { id: 'checkbodIdOne', name: 'checkbodNameOne' },
+			label: 'checkbodIdOne'
+		};
+		const html = ReactDOMServer.renderToString(
+			<CheckboxInput {...props} />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should receive and set the checkbox id', () => {
 		wrapper.setProps({ field: { id: 'checkbodIdOne' } });
 		expect(wrapper.props().field.id).toEqual('checkbodIdOne');

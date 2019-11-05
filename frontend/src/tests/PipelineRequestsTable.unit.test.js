@@ -1,7 +1,9 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import PipelineRequestsTable from '../components/tables/PipelineRequestsTable';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('ProjectInformationTable', () => {
 	const data = [
@@ -25,6 +27,19 @@ describe('ProjectInformationTable', () => {
 			<PipelineRequestsTable data={data} />
 		</Router>
 	);
+
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(
+			<Router>
+				<PipelineRequestsTable data={data} />
+			</Router>
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render a ReactTable', () => {
 		expect(wrapper.find('div.ReactTable').length).toBe(1);
 	});

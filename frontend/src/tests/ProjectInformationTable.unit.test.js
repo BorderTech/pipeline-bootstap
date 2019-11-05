@@ -2,8 +2,31 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import ProjectInformationTable from '../components/tables/ProjectInformationTable';
 import { Table } from 'reactstrap';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('ProjectInformationTable', () => {
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		let props = {
+			requestor: 'ABC123',
+			created: '2018-01-01',
+			projectName: 'Test Project',
+			projectDescription: 'Test Proj Desc',
+			projectType: 'business',
+			projectLead: 'ABC123',
+			projectTechLead: 'ABC123',
+			orgUnit: 'TEST',
+			wbsCode: '12345'
+		};
+		const html = ReactDOMServer.renderToString(
+			<ProjectInformationTable {...props} />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	const wrapper = shallow(<ProjectInformationTable />);
 	it('should render a Table', () => {
 		expect(wrapper.find(Table).length).toBe(1);

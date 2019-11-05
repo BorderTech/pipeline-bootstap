@@ -1,10 +1,23 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import ErrorAlert from '../components/layout/ErrorAlert';
+import ReactDOMServer from 'react-dom/server';
+import { axe, toHaveNoViolations } from 'jest-axe';
 
 describe('ErrorAlert', () => {
 	const errorMessage = 'Test Error Message';
 	const errorObject = { error: 'some detailed error object' };
+
+	expect.extend(toHaveNoViolations);
+
+	it('should not have basic accessibility issues', async () => {
+		const html = ReactDOMServer.renderToString(
+			<ErrorAlert message={errorMessage} />
+		);
+		const results = await axe(html);
+		expect(results).toHaveNoViolations();
+	});
+
 	it('should render a alert div', () => {
 		expect(
 			mount(<ErrorAlert message={errorMessage} />).find(
