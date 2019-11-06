@@ -129,7 +129,6 @@ export class PipelineRequest extends Component {
 		try {
 			this.setState({ creatingPipeline: true });
 			const response = await API.post(`pipelines`, createPipelineDto);
-			console.log(response);
 			this.props.history.push({
 				pathname: `/pipelines/${response.data.id}/success`
 			});
@@ -151,12 +150,26 @@ export class PipelineRequest extends Component {
 			const response = await API.get(`pipeline-requests/${id}`);
 			this.setState({ pipelineRequest: response.data, loading: false });
 		} catch (error) {
-			const { message } = error.response.data.message;
-			this.setState({
-				errorMessage: message,
-				errorObject: error.response ? error.response : error,
-				loading: false
-			});
+			if (error.response) {
+				const { message } = error.response.data.message;
+				this.setState({
+					errorMessage: message,
+					errorObject: error.response ? error.response : error,
+					loading: false
+				});
+			} else if (error.request) {
+				this.setState({
+					errorMessage:
+						'Error contacting server. Please contact your systems administrator.',
+					loading: false
+				});
+			} else {
+				this.setState({
+					errorMessage:
+						'Request error. Please contact your systems administrator.',
+					loading: false
+				});
+			}
 		}
 	}
 

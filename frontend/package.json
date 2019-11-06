@@ -32,6 +32,8 @@
 		"jest": "24.7.1",
 		"jest-cli": "24.7.1",
 		"lighthouse": "3.2.1",
+		"pa11y": "^5.3.0",
+		"pa11y-ci": "^2.3.0",
 		"puppeteer": "^1.18.1",
 		"react-axe": "^3.3.0",
 		"react-test-renderer": "16.4.1",
@@ -48,6 +50,7 @@
 		"unit-test": "node ./node_modules/jest/bin/jest --verbose",
 		"ui-test": "node ./node_modules/jest/bin/jest --testMatch=**/?(*.)ui.test.js?(x)",
 		"lighthouse": "node ./node_modules/lighthouse/lighthouse-cli/index.js --quiet --chrome-flags='--headless' http://localhost:3000",
+		"test-pa11y": "./node_modules/.bin/pa11y-ci",
 		"eject": "react-scripts eject"
 	},
 	"jest": {

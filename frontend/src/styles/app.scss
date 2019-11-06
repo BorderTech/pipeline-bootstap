@@ -96,3 +96,9 @@ footer {
 .navbar-light .navbar-nav .nav-link:hover {
   color: lightgray;
 }
+
+/* Override the primary button colour of 
+bootstrap to fix pa11y contrast error */
+.btn.btn-primary {
+  background: #0072ed !important;
+}

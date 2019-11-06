@@ -41,13 +41,13 @@ export class CreateRequestForm extends Component {
 			} else if (error.request) {
 				this.setState({
 					formSubmitError:
-						'Error contacting server. Please contact your systems administrator'
+						'Error contacting server. Please contact your systems administrator.'
 				});
 				console.log(error.request);
 			} else {
 				this.setState({
 					formSubmitError:
-						'Request error. Please contact your systems administrator'
+						'Request error. Please contact your systems administrator.'
 				});
 				console.log('Error', error.message);
 			}

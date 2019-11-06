@@ -1,0 +1,8 @@
+{
+	"standard": "WCAG2AA",
+  	"level": "error",
+	"default": {
+        "timeout": 1000
+    },
+	"urls": ["http://localhost:3000", "http://localhost:3000/pipeline-requests", "http://localhost:3000/pipeline-requests/:id", "http://localhost:3000/pipeline-requests/create"]
+}
