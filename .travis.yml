@@ -21,6 +21,7 @@ matrix:
       node_js: 10
       before_script:
         - cd frontend
+        - npm run-script sass
         - npm install
       script:
         - npm run start & sleep 10; npm run test-pa11y
