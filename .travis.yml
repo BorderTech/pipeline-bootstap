@@ -1,4 +1,5 @@
 matrix:
+  #backend unit tests
   include:
     - language: node_js
       node_js: 10
@@ -6,9 +7,20 @@ matrix:
         - cd backend
         - npm install
 
+  # frontend unit tests
   include:
     - language: node_js
       node_js: 10
       before_script:
         - cd frontend
         - npm install
+
+  # pa11y accessibility testing
+  include:
+    - language: node_js
+      node_js: 10
+      before_script:
+        - cd frontend
+        - npm install
+      script:
+        - npm run start & sleep 10; npm run test-pa11y
