@@ -84,7 +84,7 @@ describe('CreateRequestForm validation', () => {
 		expect(wrapper.find('input#requestor').props().value).toEqual('ABC123');
 	});
 
-	it('Should show error with invalid requestor ID input field on blur', async () => {
+	it('Should show error with invalid empty projectName input field on blur', async () => {
 		const errorMessage = 'A project name is required.';
 		const field = wrapper.find('input#projectName');
 		field.simulate('focus');
