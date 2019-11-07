@@ -37,19 +37,16 @@ export class CreateRequestForm extends Component {
 						'Something went wrong creating your request.',
 					formSubmitErrorObject: error.response.data
 				});
-				console.log(error.response.data);
 			} else if (error.request) {
 				this.setState({
 					formSubmitError:
 						'Error contacting server. Please contact your systems administrator.'
 				});
-				console.log(error.request);
 			} else {
 				this.setState({
 					formSubmitError:
 						'Request error. Please contact your systems administrator.'
 				});
-				console.log('Error', error.message);
 			}
 		}
 		setSubmitting(false);
@@ -197,19 +194,28 @@ export class CreateRequestForm extends Component {
 												touched={touched.projectLead}
 												required
 											/>
-											<TextInput
-												id='projectTechLead'
-												label='Project Tech Lead'
-												type='text'
-												placeholder='Enter your project tech lead'
-												value={values.projectTechLead}
-												handleChange={handleChange}
-												handleBlur={handleBlur}
-												errors={errors.projectTechLead}
-												touched={
-													touched.projectTechLead
-												}
-											/>
+
+											{/* Conditionally display tech lead */}
+											{values.projectType ===
+											'software' ? (
+												<TextInput
+													id='projectTechLead'
+													label='Project Tech Lead'
+													type='text'
+													placeholder='Enter your project tech lead'
+													value={
+														values.projectTechLead
+													}
+													handleChange={handleChange}
+													handleBlur={handleBlur}
+													errors={
+														errors.projectTechLead
+													}
+													touched={
+														touched.projectTechLead
+													}
+												/>
+											) : null}
 										</Columns>
 
 										{/* WBS Code */}
