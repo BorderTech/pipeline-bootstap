@@ -2,6 +2,10 @@
 
 Graduate team project to create an app to automate set up of SDLC automation pipeline artefacts.
 
+## Status
+
+[![Build Status](https://travis-ci.com/BorderTech/pipeline-bootstap.svg?branch=master)](https://travis-ci.com/BorderTech/pipeline-bootstap)
+
 ## Purpose
 
 Pipeline Bootstrap is a new way for software and business projects to create a set of artefacts in the Department’s CI/CD pipeline using existing service APIs. The aim is to simplify the setup and configuration of a pipeline accross across multiple systems.
