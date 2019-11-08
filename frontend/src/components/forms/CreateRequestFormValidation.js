@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
 export const CreateRequestFormValidationSchema = Yup.object().shape({
+	requestor: Yup.string().required('A requestor is required.'),
 	projectType: Yup.string().required('A project type is required.'),
 	projectName: Yup.string().required('A project name is required.'),
 	projectDescription: Yup.string().required(
