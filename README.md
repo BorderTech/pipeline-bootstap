@@ -1,30 +1,24 @@
 # pipeline-bootstap
+
 Graduate team project to create an app to automate set up of SDLC automation pipeline artefacts.
 
 ## Purpose
 
-@TODO: team to complete this section. WHat is the product and why it is useful.
+Pipeline Bootstrap is a new way for software and business projects to create a set of artefacts in the Department’s CI/CD pipeline using existing service APIs. The aim is to simplify the setup and configuration of a pipeline accross across multiple systems.
 
-### Running
+It uses a custom API for all requests. Supports the automated creation of the following pipeline components:
 
-@TODO team to provide information as to how to run the product.
+-   Jira projects (Server edition only)
+-   Confluences spaces (Server edition only)
+-   Bitbucket repositories (Server edition only)
+-   Jenkins jobs
+
+Pipeline Bootstrap is the first step to an entirely self-service portal to allow to creation of pipelines without administrator intervention.
 
 ## Contributing
 
-@TODO: team to complete this section and add a `CONTRIBUTING.md` file to the project root linked from here.
+Contributions welcome: See the CONTRIBUTING and CODE_OF_CONDUCT files in this project.
 
-### Building
+## Building, Running & Testing
 
-@TODO team to provide information as to how to build the product.
-
-### Testing
-
-@TODO team to provide information as to how to test changes to the product.
-
-### Code of conduct
-
-@TODO: team to complete this section and add a `CODE_OF_CONDUCT.md` file to the project root linked from here.
-
-## Commit Template
-
-@TODO: team to complete this section and add a commit template - `.gitmessage.txt` - to the project root.
+There are two components to the Pipeline Bootstrap application. See the respective `frontend` and `backend` README files for instructions on how to build, run and test the application.
