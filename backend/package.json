@@ -39,7 +39,7 @@
 		"rxjs": "^6.5.3",
 		"sql.js": "^1.0.0",
 		"swagger-ui-express": "^4.1.1",
-		"typeorm": "^0.2.19",
+		"typeorm": "^0.2.25",
 		"winston": "^3.2.1",
 		"xml2js": "^0.4.22"
 	},
